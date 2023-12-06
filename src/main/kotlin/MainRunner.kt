@@ -5,7 +5,8 @@ class MainRunner (
 ) {
 
     fun main () {
-        var operation = ProcessingOperation().apply {
+        // TODO: This configuration needs to be read from a JSON file or from the terminal.
+        var operation = ProcessingProcess().apply {
             profile = Profile().apply {
                 operation = "backup"
                 algorithm = "full"

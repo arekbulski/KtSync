@@ -1,6 +1,6 @@
 import com.github.ajalt.mordant.terminal.Terminal
 
-class ProcessingOperation {
+class ProcessingProcess {
 
     var profile: Profile? = null
     var terminal: Terminal? = null

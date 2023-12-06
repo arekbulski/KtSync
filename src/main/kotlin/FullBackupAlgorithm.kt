@@ -4,12 +4,13 @@ class FullBackupAlgorithm (
     val subprocessor: Processor
 ) : Processor() {
 
-    override fun backupProcess(operation: ProcessingOperation): Result {
+    override fun backupProcess(process: ProcessingProcess): Result {
         val root = ProcessingFile().apply {
-            this.operation = operation
-            this.sourcePathname = File(operation.profile!!.sourcePath!!).canonicalPath
-            this.destinationPathname = File(operation.profile!!.destinationPath!!).canonicalPath
-            this.isFolder = true
+            this.process = process
+            sourcePathname = File(process.profile!!.sourcePath!!).canonicalPath
+            destinationPathname = File(process.profile!!.destinationPath!!).canonicalPath
+            // TODO:  isFolder needs to be verified, not just "yes. yes.".
+//            isFolder = true
         }
         return this.backupFolder(root)
     }
@@ -39,7 +40,7 @@ class FullBackupAlgorithm (
             return Result(ResultStatus.Failure, "Source folder ${sourceBranch} failed to list sub-files and sub-directories.")
         for (subfile in subfiles) {
             val subprocessing = ProcessingFile().apply {
-                operation = folder.operation
+                process = folder.process
                 sourcePathname = subfile.absolutePath
                 destinationPathname = destinationBranch.resolve(subfile.name).absolutePath
                 isRegularFile = subfile.isFile

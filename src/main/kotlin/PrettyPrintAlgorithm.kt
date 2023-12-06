@@ -5,8 +5,8 @@ class PrettyPrintAlgorithm (
     val subprocessor: Processor
 ) : Processor() {
 
-    override fun backupProcess(operation: ProcessingOperation): Result {
-        val terminal = operation.terminal!!
+    override fun backupProcess(process: ProcessingProcess): Result {
+        val terminal = process.terminal!!
 
         terminal.println(Markdown("""
             ## Debug
@@ -14,7 +14,7 @@ class PrettyPrintAlgorithm (
         """.trimIndent()))
 
         passthrough({
-            subprocessor.backupProcess(operation)
+            subprocessor.backupProcess(process)
         }, {
             terminal.println("backupProcess() came back, all green, $it")
         }, {

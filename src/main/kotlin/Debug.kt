@@ -3,11 +3,12 @@ class Debug (
     val subprocessor: Processor
 ) : Processor () {
 
-    override fun backupProcess(operation: ProcessingOperation): Result {
-        operation.terminal?.println("(debug) into backupProcess (operation has no details yet)")
-        val subresult = subprocessor.backupProcess(operation)
+    override fun backupProcess(process: ProcessingProcess): Result {
+        process.terminal?.println("(debug) into backupProcess (process has no details yet)")
+        val subresult = subprocessor.backupProcess(process)
         if (subprocessor !is DoNothing)
-            operation.terminal?.println("(debug) out of backupProcess (operation has no details yet)")
+            // TODO: Debug methods are lacking in printing details.
+            process.terminal?.println("(debug) out of backupProcess (process has no details yet)")
         return subresult
     }
 

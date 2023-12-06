@@ -7,9 +7,9 @@ class Result (
 ) {
 
     override fun toString(): String {
-        return "$status${if (description != null) " ($description)" else ""}" +
-                (if (exception != null) " caused by $exception" else "") +
-                (if (processor != null) " thrown by $processor" else "")
+        return "$status" + if (description != null) " ($description)" else "" +
+            (if (exception != null) " caused by $exception" else "") +
+            (if (processor != null) " thrown by $processor" else "")
     }
 
 }

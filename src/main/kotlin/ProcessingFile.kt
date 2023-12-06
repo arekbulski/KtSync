@@ -1,7 +1,7 @@
 
 class ProcessingFile {
 
-    var operation: ProcessingOperation? = null
+    var process: ProcessingProcess? = null
     var sourcePathname: String? = null
     var destinationPathname: String? = null
     var isRegularFile: Boolean? = null
