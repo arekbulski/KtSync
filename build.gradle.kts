@@ -11,6 +11,8 @@ repositories {
 }
 
 dependencies {
+    implementation("com.github.ajalt.mordant:mordant:2.2.0")
+    implementation("com.beust:klaxon:5.5")
     testImplementation(kotlin("test"))
 }
 
