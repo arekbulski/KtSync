@@ -20,6 +20,8 @@ class MainRunner (
                 destinationPath = "temporary/destination1"
             }
             terminal = Terminal()
+            successfulEntries = 0
+            successfulBytes = 0
             failedEntries = 0
             failedBytes = 0
         }

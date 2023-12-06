@@ -20,7 +20,7 @@ class PrettyPrintAlgorithm (
         passthrough({
             subprocessor.backupProcess(process)
         }, {
-            terminal.println((brightGreen)("All done. Everything is backed up."))
+            terminal.println((brightGreen)("All done. Everything, ${(brightWhite)("${process.successfulEntries} files")} totaling ${(brightWhite)("${process.successfulBytes} bytes")}, is backed up."))
         }, {
             terminal.println((brightYellow)("Backup has partially failed. ${(brightWhite)("${process.failedEntries} files")} totaling ${(brightWhite)("${process.failedBytes} bytes")} were not backed up."))
             throw it

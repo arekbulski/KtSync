@@ -13,74 +13,78 @@ class FullBackupAlgorithm (
         val sourcePath = profile.sourcePath!!
         val destinationPath = profile.destinationPath!!
 
-        if (Files.isSymbolicLink(File(sourcePath).toPath()))
-            throw FailedException("Source folder $sourcePath is a symbolic link.")
-        if (Files.isSymbolicLink(File(destinationPath).toPath()))
-            throw FailedException("Source folder $destinationPath is a symbolic link.")
+        subprocessor.backupProcess(process)
 
-        val sourceBranch = File(sourcePath).canonicalFile
-        val destinationBranch = File(destinationPath).canonicalFile
+        // TODO: TBR. Move check to LocalDiskbackend.
+        if (subprocessor.isSymbolicLink(sourcePath))
+            throw FailedException("Source folder $sourcePath is a symbolic link.")
+        if (subprocessor.isSymbolicLink(destinationPath))
+            throw FailedException("Destination folder $destinationPath is a symbolic link.")
 
         val root = ProcessingFile().apply {
             this.process = process
-            sourcePathname = sourceBranch.canonicalPath
-            destinationPathname = destinationBranch.canonicalPath
-            isRoot = true
+            this.sourcePath = subprocessor.canonical(sourcePath)
+            this.destinationPath = subprocessor.canonical(destinationPath)
+            this.isRoot = true
         }
 
         return this.backupFolder(root)
     }
 
+    @OptIn(ExperimentalUnsignedTypes::class)
     override fun backupFolder(folder: ProcessingFile) {
-        val sourceBranch = File(folder.sourcePathname!!)
-        val destinationBranch = File(folder.destinationPathname!!)
+        val sourcePath = folder.sourcePath!!
+        val destinationPath = folder.destinationPath!!
 
-        if (! Files.exists(sourceBranch.toPath(), LinkOption.NOFOLLOW_LINKS))
-            throw FailedException("Source folder $sourceBranch does not exist.", null, this)
-        if (! Files.isDirectory(sourceBranch.toPath(), LinkOption.NOFOLLOW_LINKS))
-            throw FailedException("Source folder $sourceBranch is not a folder.", null, this)
+        if (! subprocessor.exists(sourcePath))
+            throw FailedException("Source folder $sourcePath does not exist.", null, this)
+        if (! subprocessor.isDirectory(sourcePath))
+            throw FailedException("Source folder $sourcePath is not a folder.", null, this)
         folder.isFolder = true
-        if (Files.exists(destinationBranch.toPath(), LinkOption.NOFOLLOW_LINKS)) {
+        if (subprocessor.exists(destinationPath)) {
             if (folder.isRoot == true) {
                 val datetime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss"))
-                val destinationRenamed = File("${destinationBranch.canonicalPath}-trash-$datetime")
-                if (! destinationBranch.renameTo(destinationRenamed))
-                    throw FailedException("Destination folder $destinationBranch could not be renamed.", null, this)
+                val destinationRenamed = "${destinationPath}-trash-$datetime"
+                if (! subprocessor.renameTo(destinationPath, destinationRenamed))
+                    throw FailedException("Destination folder $destinationPath could not be renamed.", null, this)
             }
             if (folder.isRoot == false) {
-                throw FailedException("Destination folder $destinationBranch already exists.", null, this)
+                throw FailedException("Destination folder $destinationPath already exists.", null, this)
             }
             if (folder.isRoot == null) {
                 throw IllegalStateException("isRoot should not be null.")
             }
         }
 
-        if (! destinationBranch.mkdir())
-            throw FailedException("Destination folder $destinationBranch failed to create.", null, this)
+        if (! subprocessor.createFolder(destinationPath))
+            throw FailedException("Destination folder $destinationPath failed to create.", null, this)
 
         subprocessor.backupFolder(folder)
 
-        val subfiles = sourceBranch.listFiles()
-            ?: throw FailedException("Source folder $sourceBranch failed to list entries.", null, this)
+        val entries = subprocessor.listFolderEntries(sourcePath)
         var partiallyFailed = 0
-        for (subfile in subfiles) {
+        for (entry in entries) {
             try {
                 val subprocessing = ProcessingFile().apply {
-                    process = folder.process
-                    sourcePathname = subfile.absolutePath
-                    destinationPathname = destinationBranch.resolve(subfile.name).canonicalPath
-                    isRoot = false
-                    isRegularFile = Files.isRegularFile(subfile.toPath(), LinkOption.NOFOLLOW_LINKS)
-                    isFolder = Files.isDirectory(subfile.toPath(), LinkOption.NOFOLLOW_LINKS)
+                    this.process = folder.process
+                    this.sourcePath = entry
+                    this.destinationPath = subprocessor.resolve(destinationPath, subprocessor.extractName(entry))
+                    this.isRoot = false
+                    this.isRegularFile = subprocessor.isRegularFile(entry)
+                    this.isFolder = subprocessor.isDirectory(entry)
                 }
                 if (subprocessing.isFolder == true) {
                     this.backupFolder(subprocessing)
+                    (folder.process!!).successfulEntries++
                 }
                 if (subprocessing.isRegularFile == true) {
                     this.backupFile(subprocessing)
+                    (folder.process!!).successfulEntries++
+                    // TODO: File size to be determined.
+                    (folder.process!!).successfulBytes += 1024
                 }
                 if ((subprocessing.isRegularFile != true) && (subprocessing.isFolder != true)) {
-                    throw FailedException("Source entry $subfile is not a regular file nor a folder.", null, this)
+                    throw FailedException("Source entry $entry is not a regular file nor a folder.", null, this)
                 }
             } catch (e: PartiallyFailedException) {
                 partiallyFailed++
@@ -92,27 +96,33 @@ class FullBackupAlgorithm (
 
         // TODO: How do I pretty print this?
         if (partiallyFailed > 0)
-            throw PartiallyFailedException("Source folder $sourceBranch failed to backup $partiallyFailed entries.", null, this)
+            throw PartiallyFailedException("Source folder $sourcePath failed to backup $partiallyFailed entries.", null, this)
     }
 
+    @ExperimentalUnsignedTypes
     override fun backupFile(file: ProcessingFile) {
-        val sourceNode = File(file.sourcePathname!!)
-        val destinationNode = File(file.destinationPathname!!)
+        val sourcePath = file.sourcePath!!
+        val destinationPath = file.destinationPath!!
 
         if (file.isRoot == true)
             throw IllegalStateException("isRoot should be false or null.")
-        if (! Files.exists(sourceNode.toPath(), LinkOption.NOFOLLOW_LINKS))
-            throw FailedException("Source file $sourceNode does not exist.", null, this)
-        if (! Files.isRegularFile(sourceNode.toPath(), LinkOption.NOFOLLOW_LINKS))
-            throw FailedException("Source file $sourceNode is not a regular file.", null, this)
+        if (! subprocessor.exists(sourcePath))
+            throw FailedException("Source file $sourcePath does not exist.", null, this)
+        if (! subprocessor.isRegularFile(sourcePath))
+            throw FailedException("Source file $sourcePath is not a regular file.", null, this)
         file.isRegularFile = true
-        if (Files.exists(destinationNode.toPath(), LinkOption.NOFOLLOW_LINKS))
-                throw FailedException("Destination file $destinationNode already exists.", null, this)
+        if (subprocessor.exists(destinationPath))
+            throw FailedException("Destination file $destinationPath already exists.", null, this)
 
-        if (! destinationNode.createNewFile())
-            throw FailedException("Destination file $destinationNode failed to create.", null, this)
+//        if (! subprocessor.createRegularFile(destinationPath))
+//            throw FailedException("Destination file $destinationPath failed to create.", null, this)
 
         subprocessor.backupFile(file)
+
+        val data = subprocessor.readFileContent(sourcePath)
+        subprocessor.writeFileContent(destinationPath, data)
+
+        // TODO: Need to read source content, write content to destination file, etc.
     }
 
 }

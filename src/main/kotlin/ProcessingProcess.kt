@@ -4,6 +4,8 @@ class ProcessingProcess {
 
     var profile: Profile? = null
     var terminal: Terminal? = null
+    var successfulEntries: Int = 0
+    var successfulBytes: Int = 0
     var failedEntries: Int = 0
     var failedBytes: Int = 0
 
