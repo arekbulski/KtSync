@@ -1,7 +1,8 @@
 
 fun main(args: Array<String>) {
 
-    var subprocessor = DoNothing()
+    var subprocessor: Processor = DoNothing()
+    subprocessor = Debug(subprocessor)
     var main = MainRunner(subprocessor)
 
 }
