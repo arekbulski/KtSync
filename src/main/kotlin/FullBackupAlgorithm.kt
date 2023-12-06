@@ -1,4 +1,6 @@
 import java.io.File
+import java.nio.file.Files
+import java.nio.file.LinkOption
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -7,13 +9,25 @@ class FullBackupAlgorithm (
 ) : Processor() {
 
     override fun backupProcess(process: ProcessingProcess) {
+        val profile = process.profile!!
+        val sourcePath = profile.sourcePath!!
+        val destinationPath = profile.destinationPath!!
+
+        if (Files.isSymbolicLink(File(sourcePath).toPath()))
+            throw FailedException("Source folder $sourcePath is a symbolic link.")
+        if (Files.isSymbolicLink(File(destinationPath).toPath()))
+            throw FailedException("Source folder $destinationPath is a symbolic link.")
+
+        val sourceBranch = File(sourcePath).canonicalFile
+        val destinationBranch = File(destinationPath).canonicalFile
+
         val root = ProcessingFile().apply {
             this.process = process
-            sourcePathname = File(process.profile!!.sourcePath!!).canonicalPath
-            destinationPathname = File(process.profile!!.destinationPath!!).canonicalPath
+            sourcePathname = sourceBranch.canonicalPath
+            destinationPathname = destinationBranch.canonicalPath
             isRoot = true
         }
-        // TODO: Should this be in try catch?
+
         return this.backupFolder(root)
     }
 
@@ -21,12 +35,12 @@ class FullBackupAlgorithm (
         val sourceBranch = File(folder.sourcePathname!!)
         val destinationBranch = File(folder.destinationPathname!!)
 
-        if (! sourceBranch.exists())
+        if (! Files.exists(sourceBranch.toPath(), LinkOption.NOFOLLOW_LINKS))
             throw FailedException("Source folder $sourceBranch does not exist.", null, this)
-        if (! sourceBranch.isDirectory())
+        if (! Files.isDirectory(sourceBranch.toPath(), LinkOption.NOFOLLOW_LINKS))
             throw FailedException("Source folder $sourceBranch is not a folder.", null, this)
         folder.isFolder = true
-        if (destinationBranch.exists()) {
+        if (Files.exists(destinationBranch.toPath(), LinkOption.NOFOLLOW_LINKS)) {
             if (folder.isRoot == true) {
                 val datetime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss"))
                 val destinationRenamed = File("${destinationBranch.canonicalPath}-trash-$datetime")
@@ -56,8 +70,8 @@ class FullBackupAlgorithm (
                     sourcePathname = subfile.absolutePath
                     destinationPathname = destinationBranch.resolve(subfile.name).canonicalPath
                     isRoot = false
-                    isRegularFile = subfile.isFile
-                    isFolder = subfile.isDirectory
+                    isRegularFile = Files.isRegularFile(subfile.toPath(), LinkOption.NOFOLLOW_LINKS)
+                    isFolder = Files.isDirectory(subfile.toPath(), LinkOption.NOFOLLOW_LINKS)
                 }
                 if (subprocessing.isFolder == true) {
                     this.backupFolder(subprocessing)
@@ -66,13 +80,17 @@ class FullBackupAlgorithm (
                     this.backupFile(subprocessing)
                 }
                 if ((subprocessing.isRegularFile != true) && (subprocessing.isFolder != true)) {
-                    throw FailedException("Source folder $sourceBranch is not a regular file nor a folder.", null, this)
+                    throw FailedException("Source entry $subfile is not a regular file nor a folder.", null, this)
                 }
             } catch (e: PartiallyFailedException) {
                 partiallyFailed++
+                (folder.process!!).failedEntries++
+                // TODO: File size to be determined.
+                (folder.process!!).failedBytes += 1024
             }
         }
 
+        // TODO: How do I pretty print this?
         if (partiallyFailed > 0)
             throw PartiallyFailedException("Source folder $sourceBranch failed to backup $partiallyFailed entries.", null, this)
     }
@@ -83,12 +101,12 @@ class FullBackupAlgorithm (
 
         if (file.isRoot == true)
             throw IllegalStateException("isRoot should be false or null.")
-        if (! sourceNode.exists())
+        if (! Files.exists(sourceNode.toPath(), LinkOption.NOFOLLOW_LINKS))
             throw FailedException("Source file $sourceNode does not exist.", null, this)
-        if (! sourceNode.isFile())
+        if (! Files.isRegularFile(sourceNode.toPath(), LinkOption.NOFOLLOW_LINKS))
             throw FailedException("Source file $sourceNode is not a regular file.", null, this)
         file.isRegularFile = true
-        if (destinationNode.exists())
+        if (Files.exists(destinationNode.toPath(), LinkOption.NOFOLLOW_LINKS))
                 throw FailedException("Destination file $destinationNode already exists.", null, this)
 
         if (! destinationNode.createNewFile())

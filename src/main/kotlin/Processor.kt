@@ -5,8 +5,6 @@ abstract class Processor {
     abstract fun backupFolder (folder: ProcessingFile)
     abstract fun backupFile (file: ProcessingFile)
 
-    // TODO: This needs some experimentation.
-    // TODO: And it needs a rename too.
     fun passthrough (action: () -> Unit,
                      onSuccess: (() -> Unit)? = null,
                      onPartiallyFailed: ((Exception) -> Unit)? = null,

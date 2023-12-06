@@ -6,7 +6,6 @@ class Debug (
 ) : Processor () {
 
     override fun backupProcess(process: ProcessingProcess) {
-        // TODO: Debug methods are lacking in printing details.
         val terminal = process.terminal!!
         terminal.println((brightMagenta)("(debug) into backupProcess ($process)"))
         subprocessor.backupProcess(process)
@@ -15,7 +14,6 @@ class Debug (
     }
 
     override fun backupFolder(folder: ProcessingFile) {
-        // TODO: Debug methods are lacking in printing details.
         val terminal = folder.process?.terminal!!
         terminal.println((brightMagenta)("(debug) into backupFolder ($folder)"))
         subprocessor.backupFolder(folder)
@@ -24,7 +22,6 @@ class Debug (
     }
 
     override fun backupFile(file: ProcessingFile) {
-        // TODO: Debug methods are lacking in printing details.
         val terminal = file.process?.terminal!!
         terminal.println((brightMagenta)("(debug) into backupFile ($file)"))
         subprocessor.backupFile(file)
