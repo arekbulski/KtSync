@@ -1,6 +1,6 @@
 
 class ProcessingOperation {
 
-    var profile: Profile = Profile()
+    var profile: Profile? = null
 
 }

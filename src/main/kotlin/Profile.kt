@@ -1,9 +1,9 @@
 
 class Profile {
 
-    var operation: String = "???"
-    var algorithm: String = "???"
-    var sourcePath: String = "???"
-    var destinationPath: String = "???"
+    var operation: String? = null
+    var algorithm: String? = null
+    var sourcePath: String? = null
+    var destinationPath: String? = null
 
 }
