@@ -14,6 +14,7 @@ dependencies {
     implementation("com.github.ajalt.mordant:mordant:2.2.0")
     implementation("com.beust:klaxon:5.5")
     testImplementation(kotlin("test"))
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
 }
 
 tasks.test {
