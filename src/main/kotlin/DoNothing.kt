@@ -2,6 +2,10 @@
 class DoNothing : Processor() {
 
     override fun backupProcess(operation: ProcessingOperation): Result {
+        // TODO: Experimenting with Failure status and exceptions.
+//        return Result(ResultStatus.Failure, "Do you see me?", processor=this)
+//        throw IllegalStateException("Something went wrong in DoNothing...")
+
         return Result(ResultStatus.Success, "Bouncing back from DoNothing.")
     }
 

@@ -12,12 +12,16 @@ class PrettyPrintAlgorithm (
             Beginning a test run (hard-coded operation).
         """.trimIndent()))
 
-        // TODO: Check result for failure maybe?
-        subprocessor.backupProcess(operation)
+        // TODO: This needs more thought-through.
+        passthrough({
+            return@passthrough subprocessor.backupProcess(operation)
+        }, {
+            terminal.println("backupProcess() came back, all green, $it")
+        }, {
+            terminal.println("backupProcess() came back as $it")
+        })
 
-        terminal.println(Markdown("""
-            All done.
-        """.trimIndent()))
+        terminal.println("All done.")
 
         return Result(ResultStatus.Success)
     }
