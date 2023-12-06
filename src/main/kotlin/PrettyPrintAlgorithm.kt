@@ -1,38 +1,43 @@
 import com.github.ajalt.mordant.markdown.Markdown
+import com.github.ajalt.mordant.rendering.TextColors
+import com.github.ajalt.mordant.rendering.TextColors.brightGreen
+import com.github.ajalt.mordant.rendering.TextColors.brightYellow
 import com.github.ajalt.mordant.rendering.TextColors.brightRed
 
 class PrettyPrintAlgorithm (
     val subprocessor: Processor
 ) : Processor() {
 
-    override fun backupProcess(process: ProcessingProcess): Result {
+    override fun backupProcess(process: ProcessingProcess) {
         val terminal = process.terminal!!
 
         terminal.println(Markdown("""
             ## Debug
-            Beginning a test run (hard-coded operation).
+            Beginning a test run (a hard-coded operation).
         """.trimIndent()))
 
         passthrough({
             subprocessor.backupProcess(process)
         }, {
-            terminal.println("backupProcess() came back, all green, $it")
+            terminal.println((brightGreen)("All done. Everything is backed up."))
         }, {
-            terminal.println((brightRed)(it.toString()))
+            terminal.println((brightYellow)("Backup has partially failed due to $it."))
+            throw it
+        }, {
+            terminal.println((brightRed)("Backup has entirely failed due to $it."))
+            throw it
+        }, {
+            terminal.println((brightRed)("Backup has entirely failed due to $it."))
+            throw it
         })
-
-        // TODO: Mixes green with yellow red. This needs a rework.
-        terminal.println("All done.")
-
-        return Result(ResultStatus.Success)
     }
 
-    override fun backupFolder(folder: ProcessingFile): Result {
-        throw NotImplementedError("This method was never supposed to be called.")
+    override fun backupFolder(folder: ProcessingFile) {
+        subprocessor.backupFolder((folder))
     }
 
-    override fun backupFile(file: ProcessingFile): Result {
-        throw NotImplementedError("This method was never supposed to be called.")
+    override fun backupFile(file: ProcessingFile) {
+        subprocessor.backupFile(file)
     }
 
 }

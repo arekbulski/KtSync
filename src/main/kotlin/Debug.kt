@@ -1,25 +1,35 @@
+import com.github.ajalt.mordant.rendering.TextColors
+import com.github.ajalt.mordant.rendering.TextColors.brightMagenta
 
 class Debug (
     val subprocessor: Processor
 ) : Processor () {
 
-    override fun backupProcess(process: ProcessingProcess): Result {
-        process.terminal?.println("(debug) into backupProcess (process has no details yet)")
-        val subresult = subprocessor.backupProcess(process)
+    override fun backupProcess(process: ProcessingProcess) {
+        // TODO: Debug methods are lacking in printing details.
+        val terminal = process.terminal!!
+        terminal.println((brightMagenta)("(debug) into backupProcess ($process)"))
+        subprocessor.backupProcess(process)
         if (subprocessor !is DoNothing)
-            // TODO: Debug methods are lacking in printing details.
-            process.terminal?.println("(debug) out of backupProcess (process has no details yet)")
-        return subresult
+            terminal.println((brightMagenta)("(debug) out of backupProcess ($process)"))
     }
 
-    override fun backupFolder(folder: ProcessingFile): Result {
+    override fun backupFolder(folder: ProcessingFile) {
         // TODO: Debug methods are lacking in printing details.
-        return subprocessor.backupFolder(folder)
+        val terminal = folder.process?.terminal!!
+        terminal.println((brightMagenta)("(debug) into backupFolder ($folder)"))
+        subprocessor.backupFolder(folder)
+        if (subprocessor !is DoNothing)
+            terminal.println((brightMagenta)("(debug) out of backupFolder ($folder)"))
     }
 
-    override fun backupFile(file: ProcessingFile): Result {
+    override fun backupFile(file: ProcessingFile) {
         // TODO: Debug methods are lacking in printing details.
-        return subprocessor.backupFile(file)
+        val terminal = file.process?.terminal!!
+        terminal.println((brightMagenta)("(debug) into backupFile ($file)"))
+        subprocessor.backupFile(file)
+        if (subprocessor !is DoNothing)
+            terminal.println((brightMagenta)("(debug) out of backupFile ($file)"))
     }
 
 }

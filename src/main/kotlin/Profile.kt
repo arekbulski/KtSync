@@ -6,4 +6,8 @@ class Profile {
     var sourcePath: String? = null
     var destinationPath: String? = null
 
+    override fun toString(): String {
+        return "Profile: $operation $algorithm, from $sourcePath, to $destinationPath"
+    }
+
 }
