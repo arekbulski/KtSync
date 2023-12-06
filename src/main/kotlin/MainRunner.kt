@@ -14,6 +14,8 @@ class MainRunner (
             }
             terminal = Terminal()
         }
+
+        subprocessor.backupProcess(operation)
     }
 
 }
