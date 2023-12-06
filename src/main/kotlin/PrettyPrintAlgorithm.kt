@@ -1,4 +1,5 @@
 import com.github.ajalt.mordant.markdown.Markdown
+import com.github.ajalt.mordant.rendering.TextColors.brightRed
 
 class PrettyPrintAlgorithm (
     val subprocessor: Processor
@@ -12,26 +13,26 @@ class PrettyPrintAlgorithm (
             Beginning a test run (hard-coded operation).
         """.trimIndent()))
 
-        // TODO: This needs more thought-through.
         passthrough({
-            return@passthrough subprocessor.backupProcess(operation)
+            subprocessor.backupProcess(operation)
         }, {
             terminal.println("backupProcess() came back, all green, $it")
         }, {
-            terminal.println("backupProcess() came back as $it")
+            terminal.println((brightRed)(it.toString()))
         })
 
+        // TODO: Mixes green with yellow red. This needs a rework.
         terminal.println("All done.")
 
         return Result(ResultStatus.Success)
     }
 
     override fun backupFolder(folder: ProcessingFile): Result {
-        TODO("Not yet implemented")
+        throw NotImplementedError("This method was never supposed to be called.")
     }
 
     override fun backupFile(file: ProcessingFile): Result {
-        TODO("Not yet implemented")
+        throw NotImplementedError("This method was never supposed to be called.")
     }
 
 }
