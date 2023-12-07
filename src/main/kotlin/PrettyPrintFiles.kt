@@ -43,10 +43,16 @@ class PrettyPrintFiles (
 
         val relativePath = subprocessor.relative(file.sourcePath!!,
             subprocessor.canonical(file.process!!.profile!!.sourcePath!!))
-        val size = file.size!!
-        terminal.println(Markdown("""
-            * ${(brightWhite)(relativePath)} (${(brightWhite)(suffixedSize(size))}) a regular file 
-        """.trimIndent()))
+        if (file.isRegularFile == true) {
+            val size = file.size!!
+            terminal.println(Markdown("""
+                * ${(brightWhite)(relativePath)} (${(brightWhite)(suffixedSize(size))}) a regular file 
+            """.trimIndent()))
+        } else {
+            terminal.println(Markdown("""
+                * ${(brightWhite)(relativePath)} unknown type
+            """.trimIndent()))
+        }
     }
 
     override fun finishFile(file: ProcessingFile, success: Boolean?, description: String?) {

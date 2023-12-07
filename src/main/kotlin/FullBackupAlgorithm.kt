@@ -89,14 +89,10 @@ class FullBackupAlgorithm (
                 if (subprocessing.isFolder == true) {
                     this.backupFolder(subprocessing)
                     (folder.process!!).successfulEntries++
-                }
-                if (subprocessing.isRegularFile == true) {
+                } else {
                     this.backupFile(subprocessing)
                     (folder.process!!).successfulEntries++
                     (folder.process!!).successfulBytes += subprocessing.size!!
-                }
-                if ((subprocessing.isRegularFile != true) && (subprocessing.isFolder != true)) {
-                    throw FailedException("Source entry $entry is not a regular file nor a folder.", null, this)
                 }
             } catch (e: PartiallyFailedException) {
                 partiallyFailed++
@@ -114,23 +110,24 @@ class FullBackupAlgorithm (
         val sourcePath = file.sourcePath!!
         val destinationPath = file.destinationPath!!
 
-        // TODO: Are those really needed?
-        if (file.isRoot == true)
-            throw IllegalStateException("isRoot should be false or null.")
-        if (! subprocessor.exists(sourcePath))
-            throw FailedException("Source file $sourcePath does not exist.", null, this)
-        if (! subprocessor.isRegularFile(sourcePath))
-            throw FailedException("Source file $sourcePath is not a regular file.", null, this)
-        file.isRegularFile = true
-        if (subprocessor.exists(destinationPath))
-            throw FailedException("Destination file $destinationPath already exists.", null, this)
-
         subprocessor.backupFile(file)
+
+        passthrough({
+            if (file.isRoot == true)
+                throw IllegalStateException("isRoot should be false or null.")
+            if (! subprocessor.exists(sourcePath))
+                throw FailedException("Source file $sourcePath does not exist.", null, this)
+            if (subprocessor.isSymbolicLink(sourcePath))
+                throw FailedException("Source file $sourcePath is a symbolic link.", null, this)
+            if (! subprocessor.isRegularFile(sourcePath))
+                throw FailedException("Source file $sourcePath is not a regular file.", null, this)
+            file.isRegularFile = true
+            if (subprocessor.exists(destinationPath))
+                throw FailedException("Destination file $destinationPath already exists.", null, this)
 
 //        if (! subprocessor.createRegularFile(destinationPath))
 //            throw FailedException("Destination file $destinationPath failed to create.", null, this)
 
-        passthrough({
             val data = subprocessor.readFileContent(sourcePath)
             subprocessor.writeFileContent(destinationPath, data)
         },{
