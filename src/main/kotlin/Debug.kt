@@ -5,28 +5,36 @@ class Debug (
     subprocessor: Processor
 ) : Passthrough (subprocessor) {
 
+    val EnableDebugPrinting = false
+
     override fun backupProcess(process: ProcessingProcess) {
         val terminal = process.terminal!!
-        terminal.println((brightMagenta)("(debug) into backupProcess ($process)"))
+        if (EnableDebugPrinting)
+            terminal.println((brightMagenta)("(debug) into backupProcess ($process)"))
         subprocessor.backupProcess(process)
-        if (subprocessor !is DoNothing)
-            terminal.println((brightMagenta)("(debug) out of backupProcess ($process)"))
+        if (EnableDebugPrinting)
+            if (subprocessor !is DoNothing)
+                terminal.println((brightMagenta)("(debug) out of backupProcess ($process)"))
     }
 
     override fun backupFolder(folder: ProcessingFile) {
         val terminal = folder.process?.terminal!!
-        terminal.println((brightMagenta)("(debug) into backupFolder ($folder)"))
+        if (EnableDebugPrinting)
+            terminal.println((brightMagenta)("(debug) into backupFolder ($folder)"))
         subprocessor.backupFolder(folder)
-        if (subprocessor !is DoNothing)
-            terminal.println((brightMagenta)("(debug) out of backupFolder ($folder)"))
+        if (EnableDebugPrinting)
+            if (subprocessor !is DoNothing)
+                terminal.println((brightMagenta)("(debug) out of backupFolder ($folder)"))
     }
 
     override fun backupFile(file: ProcessingFile) {
         val terminal = file.process?.terminal!!
-        terminal.println((brightMagenta)("(debug) into backupFile ($file)"))
+        if (EnableDebugPrinting)
+            terminal.println((brightMagenta)("(debug) into backupFile ($file)"))
         subprocessor.backupFile(file)
-        if (subprocessor !is DoNothing)
-            terminal.println((brightMagenta)("(debug) out of backupFile ($file)"))
+        if (EnableDebugPrinting)
+            if (subprocessor !is DoNothing)
+                terminal.println((brightMagenta)("(debug) out of backupFile ($file)"))
     }
 
 }
