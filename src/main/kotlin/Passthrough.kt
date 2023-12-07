@@ -1,7 +1,6 @@
 abstract class Passthrough(
     val subprocessor: Processor,
-) : Processor(
-) {
+) : Processor() {
 
     override fun backupProcess(process: ProcessingProcess) {
         subprocessor.backupProcess(process)

@@ -2,8 +2,8 @@ import com.github.ajalt.mordant.rendering.TextColors
 import com.github.ajalt.mordant.rendering.TextColors.brightMagenta
 
 class Debug (
-    val subprocessor: Processor
-) : Processor () {
+    subprocessor: Processor
+) : Passthrough (subprocessor) {
 
     override fun backupProcess(process: ProcessingProcess) {
         val terminal = process.terminal!!
