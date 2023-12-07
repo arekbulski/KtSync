@@ -6,9 +6,7 @@ import com.github.ajalt.mordant.rendering.TextColors.brightWhite
 
 class PrettyPrintFiles (
     subprocessor: Processor
-) : Passthrough(
-    subprocessor,
-) {
+) : Passthrough(subprocessor) {
 
     override fun backupProcess(process: ProcessingProcess) {
         subprocessor.backupProcess(process)

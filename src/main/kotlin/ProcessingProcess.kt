@@ -6,7 +6,8 @@ class ProcessingProcess {
     var terminal: Terminal? = null
     var successfulEntries: Long = 0
     var successfulBytes: Long = 0
-    var failedEntries: Long = 0
+    var failedEntriesCount: Long = 0
+    var failedEntries = mutableMapOf<String,String>()
 
     override fun toString(): String {
         return "ProcessingProcess: $profile"

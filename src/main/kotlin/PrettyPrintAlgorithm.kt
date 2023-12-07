@@ -1,5 +1,4 @@
 import com.github.ajalt.mordant.markdown.Markdown
-import com.github.ajalt.mordant.rendering.TextColors
 import com.github.ajalt.mordant.rendering.TextColors.brightGreen
 import com.github.ajalt.mordant.rendering.TextColors.brightYellow
 import com.github.ajalt.mordant.rendering.TextColors.brightRed
@@ -20,8 +19,6 @@ class PrettyPrintAlgorithm (
 
         passthrough({
             subprocessor.backupProcess(process)
-
-            // TODO: Print next section?
         }, {
             terminal.println(Markdown("""
                 ## Summary
@@ -29,8 +26,17 @@ class PrettyPrintAlgorithm (
             """.trimIndent()))
         }, {
             terminal.println(Markdown("""
+                ## Issues
+            """.trimIndent()))
+            for ((path,reason) in process.failedEntries) {
+                val relativePath = subprocessor.relative(path, subprocessor.canonical(process.profile!!.sourcePath!!))
+                terminal.println(Markdown("""
+                    * ${(brightWhite)(relativePath)} was not backed up (${(brightYellow)(reason)}).
+                """.trimIndent()))
+            }
+            terminal.println(Markdown("""
                 ## Summary
-                ${(brightYellow)("Backup has partially failed. ${(brightWhite)("${process.successfulEntries} files/folders")} totaling ${(brightWhite)(suffixedSize(process.successfulBytes))} were successfully backed up, however ${(brightWhite)("${process.failedEntries} files/folders")} were not backed up.")}
+                ${(brightYellow)("Backup has partially failed. ${(brightWhite)("${process.successfulEntries} files/folders")} totaling ${(brightWhite)(suffixedSize(process.successfulBytes))} were successfully backed up, however ${(brightWhite)("${process.failedEntriesCount} files/folders")} were not.")}
             """.trimIndent()))
             throw it
         }, {

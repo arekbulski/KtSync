@@ -2,8 +2,8 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 class FullBackupAlgorithm (
-    val subprocessor: Processor
-) : Processor() {
+    subprocessor: Processor
+) : Passthrough(subprocessor) {
 
     override fun backupProcess(process: ProcessingProcess) {
         val profile = process.profile!!
@@ -99,11 +99,11 @@ class FullBackupAlgorithm (
                 }
             } catch (e: PartiallyFailedException) {
                 partiallyFailed++
-                (folder.process!!).failedEntries++
+                (folder.process!!).failedEntriesCount++
+                (folder.process!!).failedEntries.set(entry, e.description!!)
             }
         }
 
-        // TODO: How do I pretty print this?
         if (partiallyFailed > 0)
             throw PartiallyFailedException("Source folder $sourcePath failed to backup $partiallyFailed entries.", null, this)
     }
