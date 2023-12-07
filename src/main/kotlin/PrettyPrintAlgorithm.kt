@@ -17,7 +17,7 @@ class PrettyPrintAlgorithm (
             ## Progress
         """.trimIndent()))
 
-        passthrough({
+        propagate({
             subprocessor.backupProcess(process)
         }, {
             terminal.println(Markdown("""

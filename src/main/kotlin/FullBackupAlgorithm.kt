@@ -54,7 +54,7 @@ class FullBackupAlgorithm (
 
         subprocessor.backupFolder(folder)
 
-        passthrough({
+        propagate({
             if (! subprocessor.createFolder(destinationPath))
                 throw FailedException("Destination folder $destinationPath failed to create.", null, this)
         },{
@@ -112,7 +112,7 @@ class FullBackupAlgorithm (
 
         subprocessor.backupFile(file)
 
-        passthrough({
+        propagate({
             if (file.isRoot == true)
                 throw IllegalStateException("isRoot should be false or null.")
             if (! subprocessor.exists(sourcePath))

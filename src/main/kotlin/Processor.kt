@@ -82,11 +82,11 @@ abstract class Processor {
         throw NotImplementedError()
     }
 
-    fun passthrough (action: () -> Unit,
-                     onSuccess: (() -> Unit)? = null,
-                     onPartiallyFailed: ((PartiallyFailedException) -> Unit)? = null,
-                     onFailed: ((FailedException) -> Unit)? = null,
-                     onException: ((Exception) -> Unit)? = null, ) {
+    fun propagate (action: () -> Unit,
+                   onSuccess: (() -> Unit)? = null,
+                   onPartiallyFailed: ((PartiallyFailedException) -> Unit)? = null,
+                   onFailed: ((FailedException) -> Unit)? = null,
+                   onException: ((Exception) -> Unit)? = null, ) {
         try {
             action.invoke()
             onSuccess?.invoke()
