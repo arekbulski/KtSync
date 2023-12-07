@@ -43,6 +43,7 @@ class FullBackupAlgorithm (
                 val destinationRenamed = "${destinationPath}-trash-$datetime"
                 if (! subprocessor.renameTo(destinationPath, destinationRenamed))
                     throw FailedException("Destination folder $destinationPath could not be renamed.", null, this)
+                folder.process!!.destinationRenamedTo = subprocessor.extractName(destinationRenamed)
             }
             if (folder.isRoot == false) {
                 throw FailedException("Destination folder $destinationPath already exists.", null, this)

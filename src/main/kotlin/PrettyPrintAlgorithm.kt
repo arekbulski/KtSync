@@ -24,6 +24,11 @@ class PrettyPrintAlgorithm (
                 ## Summary
                 ${(brightGreen)("All done. Everything, ${(brightWhite)("${process.successfulEntries} files/folders")} totaling ${(brightWhite)(suffixedSize(process.successfulBytes))}, was backed up.")}
             """.trimIndent()))
+            if (process.destinationRenamedTo != null)
+                terminal.println(Markdown("""
+                    
+                    Your previous backup was renamed to ${(brightWhite)(process.destinationRenamedTo!!)}. You can dispose of it at your discretion.    
+                """.trimIndent()))
         }, {
             terminal.println(Markdown("""
                 ## Issues
@@ -38,18 +43,33 @@ class PrettyPrintAlgorithm (
                 ## Summary
                 ${(brightYellow)("Backup has partially failed. ${(brightWhite)("${process.successfulEntries} files/folders")} totaling ${(brightWhite)(suffixedSize(process.successfulBytes))} were successfully backed up, however ${(brightWhite)("${process.failedEntriesCount} files/folders")} were not.")}
             """.trimIndent()))
+            if (process.destinationRenamedTo != null)
+                terminal.println(Markdown("""
+                    
+                    Your previous backup was renamed to ${(brightWhite)(process.destinationRenamedTo!!)}. You can recover it at your discretion.    
+                """.trimIndent()))
             throw it
         }, {
             terminal.println(Markdown("""
                 ## Summary
                 ${(brightRed)("Backup has entirely failed due to $it. Destination folder is in indeterminate state.")}
             """.trimIndent()))
+            if (process.destinationRenamedTo != null)
+                terminal.println(Markdown("""
+                    
+                    Your previous backup was renamed to ${(brightWhite)(process.destinationRenamedTo!!)}. You can recover it at your discretion.    
+                """.trimIndent()))
             throw it
         }, {
             terminal.println(Markdown("""
                 ## Summary
                 ${(brightRed)("Backup has entirely failed due to unknown exception $it. Destination folder is in indeterminate state.")}
             """.trimIndent()))
+            if (process.destinationRenamedTo != null)
+                terminal.println(Markdown("""
+                    
+                    Your previous backup was renamed to ${(brightWhite)(process.destinationRenamedTo!!)}. You can recover it at your discretion.    
+                """.trimIndent()))
             throw it
         })
     }

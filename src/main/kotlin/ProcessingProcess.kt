@@ -8,6 +8,7 @@ class ProcessingProcess {
     var successfulBytes: Long = 0
     var failedEntriesCount: Long = 0
     var failedEntries = mutableMapOf<String,String>()
+    var destinationRenamedTo: String? = null
 
     override fun toString(): String {
         return "ProcessingProcess: $profile"
