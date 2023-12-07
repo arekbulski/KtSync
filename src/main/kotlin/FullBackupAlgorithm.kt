@@ -1,6 +1,3 @@
-import java.io.File
-import java.nio.file.Files
-import java.nio.file.LinkOption
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -118,8 +115,21 @@ class FullBackupAlgorithm (
 //        if (! subprocessor.createRegularFile(destinationPath))
 //            throw FailedException("Destination file $destinationPath failed to create.", null, this)
 
-        val data = subprocessor.readFileContent(sourcePath)
-        subprocessor.writeFileContent(destinationPath, data)
+        passthrough({
+            val data = subprocessor.readFileContent(sourcePath)
+            subprocessor.writeFileContent(destinationPath, data)
+        },{
+            subprocessor.finishFile(file, true, null)
+        }, {
+            subprocessor.finishFile(file, null, it.description)
+            throw it
+        }, {
+            subprocessor.finishFile(file, false, it.description)
+            throw it
+        }, {
+            subprocessor.finishFile(file, false, it.toString())
+            throw it
+        })
     }
 
 }

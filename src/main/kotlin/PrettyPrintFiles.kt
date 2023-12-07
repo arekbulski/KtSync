@@ -1,5 +1,7 @@
 import com.github.ajalt.mordant.markdown.Markdown
 import com.github.ajalt.mordant.rendering.TextColors.brightGreen
+import com.github.ajalt.mordant.rendering.TextColors.brightYellow
+import com.github.ajalt.mordant.rendering.TextColors.brightRed
 import com.github.ajalt.mordant.rendering.TextColors.brightWhite
 
 class PrettyPrintFiles (
@@ -22,9 +24,6 @@ class PrettyPrintFiles (
         """.trimIndent()))
 
         subprocessor.backupFolder(folder)
-
-        // TODO: This wont work correctly in other, failure cases.
-        terminal.println((brightGreen)("(done)"))
     }
 
     override fun backupFile(file: ProcessingFile) {
@@ -36,6 +35,19 @@ class PrettyPrintFiles (
         terminal.println(Markdown("""
             * ${(brightWhite)(relativePath)} (${(brightWhite)(suffixedSize(size))}) a regular file 
         """.trimIndent()))
+    }
+
+    override fun finishFile(file: ProcessingFile, success: Boolean?, description: String?) {
+        val terminal = file.process!!.terminal!!
+
+        if (success == true) {
+            terminal.println((brightGreen)("   (done)"))
+        }
+        if (success == false) {
+            terminal.println((brightRed)("   ($description)"))
+        }
+        if (success == null)
+            terminal.println((brightYellow)("   ($description)"))
     }
 
 }

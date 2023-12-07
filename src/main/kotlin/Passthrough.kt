@@ -14,6 +14,10 @@ abstract class Passthrough(
         subprocessor.backupFile(file)
     }
 
+    override fun finishFile(file: ProcessingFile, success: Boolean?, description: String?) {
+        subprocessor.finishFile(file, success, description)
+    }
+
     override fun canonical(pathname: String): String {
         return subprocessor.canonical(pathname)
     }

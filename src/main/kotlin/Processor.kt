@@ -1,5 +1,3 @@
-import java.io.File
-
 abstract class Processor {
 
     open fun backupProcess (process: ProcessingProcess) {
@@ -11,6 +9,10 @@ abstract class Processor {
     }
 
     open fun backupFile (file: ProcessingFile) {
+        throw NotImplementedError()
+    }
+
+    open fun finishFile (file: ProcessingFile, success: Boolean?, description: String?) {
         throw NotImplementedError()
     }
 
@@ -78,8 +80,8 @@ abstract class Processor {
 
     fun passthrough (action: () -> Unit,
                      onSuccess: (() -> Unit)? = null,
-                     onPartiallyFailed: ((Exception) -> Unit)? = null,
-                     onFailed: ((Exception) -> Unit)? = null,
+                     onPartiallyFailed: ((PartiallyFailedException) -> Unit)? = null,
+                     onFailed: ((FailedException) -> Unit)? = null,
                      onException: ((Exception) -> Unit)? = null, ) {
         try {
             action.invoke()
