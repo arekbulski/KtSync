@@ -89,8 +89,6 @@ class FullBackupAlgorithm (
             } catch (e: PartiallyFailedException) {
                 partiallyFailed++
                 (folder.process!!).failedEntries++
-                // TODO: Unobtainable file size.
-                (folder.process!!).failedBytes += 0
             }
         }
 

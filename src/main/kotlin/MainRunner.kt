@@ -23,7 +23,6 @@ class MainRunner (
             successfulEntries = 0
             successfulBytes = 0
             failedEntries = 0
-            failedBytes = 0
         }
         val terminal = process.terminal!!
 
