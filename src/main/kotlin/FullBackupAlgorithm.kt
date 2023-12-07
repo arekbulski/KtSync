@@ -15,7 +15,6 @@ class FullBackupAlgorithm (
 
         subprocessor.backupProcess(process)
 
-        // TODO: TBR. Move check to LocalDiskbackend.
         if (subprocessor.isSymbolicLink(sourcePath))
             throw FailedException("Source folder $sourcePath is a symbolic link.")
         if (subprocessor.isSymbolicLink(destinationPath))
@@ -114,15 +113,13 @@ class FullBackupAlgorithm (
         if (subprocessor.exists(destinationPath))
             throw FailedException("Destination file $destinationPath already exists.", null, this)
 
+        subprocessor.backupFile(file)
+
 //        if (! subprocessor.createRegularFile(destinationPath))
 //            throw FailedException("Destination file $destinationPath failed to create.", null, this)
 
-        subprocessor.backupFile(file)
-
         val data = subprocessor.readFileContent(sourcePath)
         subprocessor.writeFileContent(destinationPath, data)
-
-        // TODO: Need to read source content, write content to destination file, etc.
     }
 
 }
