@@ -36,6 +36,9 @@ class MainRunner (
         } catch (e: PartiallyFailedException) {
             terminal.println((brightYellow)("Aborting."))
             exitProcess(1)
+        } catch (e: Exception) {
+            terminal.println((brightRed)("Aborting."))
+            exitProcess(1)
         }
     }
 
