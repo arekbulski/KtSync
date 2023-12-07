@@ -1,10 +1,14 @@
-// TODO: Maybe write a toString?
 
 open class PartiallyFailedException (
-    description: String? = null,
-    cause: Exception? = null,
-    processor: Processor? = null,
+    open val description: String? = null,
+    open val causedBy: Exception? = null,
+    open val thrownBy: Processor? = null,
 ) : Exception(
     description,
-    cause,
-)
+) {
+
+    override fun toString(): String {
+        return "${this::class.simpleName} ($description) caused by $causedBy thrown by $thrownBy"
+    }
+
+}

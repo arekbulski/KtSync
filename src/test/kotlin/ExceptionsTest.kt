@@ -5,6 +5,16 @@ import kotlin.time.toDuration
 
 class ExceptionsTest {
 
+    @Test
+    fun testToString() {
+        val e1 = FailedException("Description", null, null)
+        assert(e1.toString() == "FailedException (Description) caused by null thrown by null")
+        val e2 = PartiallyFailedException("Description", null, null)
+        assert(e2.toString() == "PartiallyFailedException (Description) caused by null thrown by null")
+        val e3 = FailedException("TBA", Exception("TODO"), null)
+        assert(e3.toString() == "FailedException (TBA) caused by java.lang.Exception: TODO thrown by null")
+    }
+
     private fun callForException() {
         throw NotImplementedError()
     }

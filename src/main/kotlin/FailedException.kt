@@ -1,11 +1,10 @@
-// TODO: Maybe write a toString?
 
-class FailedException (
-    description: String? = null,
-    cause: Exception? = null,
-    processor: Processor? = null,
+class FailedException(
+    override val description: String? = null,
+    override val causedBy: Exception? = null,
+    override val thrownBy: Processor? = null,
 ) : PartiallyFailedException(
     description,
-    cause,
-    processor,
+    causedBy,
+    thrownBy,
 )
