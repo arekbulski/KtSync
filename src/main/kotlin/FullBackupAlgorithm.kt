@@ -34,20 +34,20 @@ class FullBackupAlgorithm (
         val destinationPath = folder.destinationPath!!
 
         if (! subprocessor.exists(sourcePath))
-            throw FailedException("Source folder $sourcePath does not exist.", null, this)
+            throw FailedException("Source folder $sourcePath does not exist.", this)
         if (! subprocessor.isDirectory(sourcePath))
-            throw FailedException("Source folder $sourcePath is not a folder.", null, this)
+            throw FailedException("Source folder $sourcePath is not a folder.", this)
         folder.isFolder = true
         if (subprocessor.exists(destinationPath)) {
             if (folder.isRoot == true) {
                 val datetime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss"))
                 val destinationRenamed = "${destinationPath}-trash-$datetime"
                 if (! subprocessor.renameTo(destinationPath, destinationRenamed))
-                    throw FailedException("Destination folder $destinationPath could not be renamed.", null, this)
+                    throw FailedException("Destination folder $destinationPath could not be renamed.", this)
                 folder.process!!.destinationRenamedTo = subprocessor.extractName(destinationRenamed)
             }
             if (folder.isRoot == false) {
-                throw FailedException("Destination folder $destinationPath already exists.", null, this)
+                throw FailedException("Destination folder $destinationPath already exists.", this)
             }
             // Under no scenario can this happen.
             if (folder.isRoot == null) {
@@ -59,7 +59,7 @@ class FullBackupAlgorithm (
 
         propagate({
             if (! subprocessor.createFolder(destinationPath))
-                throw FailedException("Destination folder $destinationPath failed to create.", null, this)
+                throw FailedException("Destination folder $destinationPath failed to create.", this)
         },{
             subprocessor.finishFolder(folder, true, null)
         }, {
@@ -105,7 +105,7 @@ class FullBackupAlgorithm (
         }
 
         if (partiallyFailed > 0)
-            throw PartiallyFailedException("Source folder $sourcePath failed to backup $partiallyFailed entries.", null, this)
+            throw PartiallyFailedException("Source folder $sourcePath failed to backup $partiallyFailed entries.", this)
     }
 
     @ExperimentalUnsignedTypes
@@ -120,14 +120,14 @@ class FullBackupAlgorithm (
             if (file.isRoot == true)
                 throw IllegalStateException("isRoot should be false or null.")
             if (! subprocessor.exists(sourcePath))
-                throw FailedException("Source file $sourcePath does not exist.", null, this)
+                throw FailedException("Source file $sourcePath does not exist.", this)
             if (subprocessor.isSymbolicLink(sourcePath))
-                throw FailedException("Source file $sourcePath is a symbolic link.", null, this)
+                throw FailedException("Source file $sourcePath is a symbolic link.", this)
             if (! subprocessor.isRegularFile(sourcePath))
-                throw FailedException("Source file $sourcePath is not a regular file.", null, this)
+                throw FailedException("Source file $sourcePath is not a regular file.", this)
             file.isRegularFile = true
             if (subprocessor.exists(destinationPath))
-                throw FailedException("Destination file $destinationPath already exists.", null, this)
+                throw FailedException("Destination file $destinationPath already exists.", this)
 
             val data = subprocessor.readFileContent(sourcePath)
             subprocessor.writeFileContent(destinationPath, data)
