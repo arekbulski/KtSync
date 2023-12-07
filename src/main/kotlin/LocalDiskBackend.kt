@@ -21,15 +21,11 @@ class LocalDiskBackend (
     }
 
     override fun canonical (pathname: String): String {
-        // TODO: Needs experimental verification.
-        if (isSymbolicLink(pathname))
-            throw FailedException("Pathname $pathname is a symbolic link.")
         return File(pathname).canonicalPath
     }
 
     override fun resolve(pathname: String, relative: String): String {
-        // TODO: Maybe absolutepath ?
-        return File(pathname).resolve(relative).canonicalPath
+        return File(pathname).resolve(relative).absolutePath
     }
 
     override fun relative(pathname: String, base: String): String {
@@ -69,8 +65,7 @@ class LocalDiskBackend (
     }
 
     override fun listFolderEntries(pathname: String): List<String> {
-        // TODO: Maybe absolutepath ?
-        return File(pathname).listFiles()?.map{ it.canonicalPath }
+        return File(pathname).listFiles()?.map{ it.absolutePath }
             ?: throw FailedException("Folder $pathname failed to list entries.")
     }
 

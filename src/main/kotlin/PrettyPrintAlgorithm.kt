@@ -31,7 +31,7 @@ class PrettyPrintAlgorithm (
             for ((path,reason) in process.failedEntries) {
                 val relativePath = subprocessor.relative(path, subprocessor.canonical(process.profile!!.sourcePath!!))
                 terminal.println(Markdown("""
-                    * ${(brightWhite)(relativePath)} was not backed up (${(brightYellow)(reason)}).
+                    * ${(brightWhite)(relativePath)} was not backed up.
                 """.trimIndent()))
             }
             terminal.println(Markdown("""

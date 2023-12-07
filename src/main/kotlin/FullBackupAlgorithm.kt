@@ -73,6 +73,7 @@ class FullBackupAlgorithm (
 
         val entries = subprocessor.listFolderEntries(sourcePath)
         var partiallyFailed = 0
+
         for (entry in entries) {
             try {
                 val subprocessing = ProcessingFile().apply {
