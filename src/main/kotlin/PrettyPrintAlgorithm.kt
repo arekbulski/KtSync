@@ -6,8 +6,8 @@ import com.github.ajalt.mordant.rendering.TextColors.brightRed
 import com.github.ajalt.mordant.rendering.TextColors.brightWhite
 
 class PrettyPrintAlgorithm (
-    val subprocessor: Processor
-) : Processor() {
+    subprocessor: Processor
+) : Passthrough(subprocessor) {
 
     override fun backupProcess(process: ProcessingProcess) {
         val terminal = process.terminal!!
@@ -15,7 +15,7 @@ class PrettyPrintAlgorithm (
         terminal.println(Markdown("""
             ## Debug
             Beginning a test run (a hard-coded operation).
-            ${process}
+            $process
             
         """.trimIndent()))
 
@@ -37,10 +37,12 @@ class PrettyPrintAlgorithm (
         })
     }
 
+    // TODO: TBR
     override fun backupFolder(folder: ProcessingFile) {
         subprocessor.backupFolder((folder))
     }
 
+    // TODO: TBR
     override fun backupFile(file: ProcessingFile) {
         subprocessor.backupFile(file)
     }
