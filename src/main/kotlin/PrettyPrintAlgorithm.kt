@@ -3,6 +3,8 @@ import com.github.ajalt.mordant.rendering.TextColors.brightGreen
 import com.github.ajalt.mordant.rendering.TextColors.brightYellow
 import com.github.ajalt.mordant.rendering.TextColors.brightRed
 import com.github.ajalt.mordant.rendering.TextColors.brightWhite
+import java.time.Duration
+import java.time.LocalDateTime
 
 class PrettyPrintAlgorithm (
     subprocessor: Processor
@@ -10,6 +12,8 @@ class PrettyPrintAlgorithm (
 
     override fun backupProcess(process: ProcessingProcess) {
         val terminal = process.terminal!!
+
+        process.timeBegun = LocalDateTime.now()
 
         terminal.println(Markdown("""
             ## Preface
@@ -20,6 +24,9 @@ class PrettyPrintAlgorithm (
         propagate({
             subprocessor.backupProcess(process)
         }, {
+            process.timeEnded = LocalDateTime.now()
+            val elapsed = Duration.between(process.timeBegun!!, process.timeEnded!!)
+
             terminal.println(Markdown("""
                 ## Summary
                 ${(brightGreen)("All done. Everything, ${(brightWhite)("${process.successfulEntries} files/folders")} totaling ${(brightWhite)(suffixedSize(process.successfulBytes))}, was backed up.")}
@@ -29,6 +36,10 @@ class PrettyPrintAlgorithm (
                     
                     Your previous backup was renamed to ${(brightWhite)(process.destinationRenamedTo!!)}. You can dispose of it at your discretion.    
                 """.trimIndent()))
+            terminal.println(Markdown("""
+                
+                Entire process took ${(brightWhite)(timeToHMS(elapsed))}.
+            """.trimIndent()))
         }, {
             terminal.println(Markdown("""
                 ## Issues
