@@ -8,10 +8,6 @@ class PrettyPrintFiles (
     subprocessor: Processor
 ) : Passthrough(subprocessor) {
 
-    override fun backupProcess(process: ProcessingProcess) {
-        subprocessor.backupProcess(process)
-    }
-
     override fun backupFolder(folder: ProcessingFile) {
         val terminal = folder.process!!.terminal!!
 

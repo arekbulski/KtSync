@@ -20,10 +20,6 @@ class MainRunner (
         try {
             subprocessor.backupProcess(process)
             exitProcess(0)
-        } catch (e: FailedException) {
-            exitProcess(1)
-        } catch (e: PartiallyFailedException) {
-            exitProcess(1)
         } catch (e: Exception) {
             exitProcess(1)
         }

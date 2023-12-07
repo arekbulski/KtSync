@@ -5,20 +5,8 @@ import java.nio.file.StandardOpenOption
 import kotlin.io.path.fileSize
 
 class LocalDiskBackend (
-    val subprocessor: Processor
-) : Processor() {
-
-    override fun backupProcess (process: ProcessingProcess) {
-        subprocessor.backupProcess(process)
-    }
-
-    override fun backupFolder (folder: ProcessingFile) {
-        subprocessor.backupFolder(folder)
-    }
-
-    override fun backupFile (file: ProcessingFile) {
-        subprocessor.backupFile(file)
-    }
+    subprocessor: Processor
+) : Passthrough(subprocessor) {
 
     override fun absolute (pathname: String): String {
         return File(pathname).absolutePath

@@ -10,6 +10,7 @@ class FullBackupAlgorithm (
         val sourcePath = profile.sourcePath!!
         val destinationPath = profile.destinationPath!!
 
+        // Currently this does nothing.
         subprocessor.backupProcess(process)
 
         if (subprocessor.isSymbolicLink(sourcePath))
@@ -48,6 +49,7 @@ class FullBackupAlgorithm (
             if (folder.isRoot == false) {
                 throw FailedException("Destination folder $destinationPath already exists.", null, this)
             }
+            // Under no scenario can this happen.
             if (folder.isRoot == null) {
                 throw IllegalStateException("isRoot should not be null.")
             }
@@ -98,7 +100,7 @@ class FullBackupAlgorithm (
             } catch (e: PartiallyFailedException) {
                 partiallyFailed++
                 (folder.process!!).failedEntriesCount++
-                (folder.process!!).failedEntries.set(entry, e.description!!)
+                (folder.process!!).failedEntries[entry] = e.description!!
             }
         }
 
@@ -114,6 +116,7 @@ class FullBackupAlgorithm (
         subprocessor.backupFile(file)
 
         propagate({
+            // Under no scenario can this happen.
             if (file.isRoot == true)
                 throw IllegalStateException("isRoot should be false or null.")
             if (! subprocessor.exists(sourcePath))
@@ -125,9 +128,6 @@ class FullBackupAlgorithm (
             file.isRegularFile = true
             if (subprocessor.exists(destinationPath))
                 throw FailedException("Destination file $destinationPath already exists.", null, this)
-
-//        if (! subprocessor.createRegularFile(destinationPath))
-//            throw FailedException("Destination file $destinationPath failed to create.", null, this)
 
             val data = subprocessor.readFileContent(sourcePath)
             subprocessor.writeFileContent(destinationPath, data)

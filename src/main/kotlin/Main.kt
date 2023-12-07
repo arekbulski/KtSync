@@ -7,7 +7,7 @@ fun main(args: Array<String>) {
     subprocessor = PrettyPrintFiles(subprocessor)
     subprocessor = FullBackupAlgorithm(subprocessor)
     subprocessor = PrettyPrintAlgorithm(subprocessor)
-    var main = MainRunner(subprocessor)
-    main.main()
+    var runner = MainRunner(subprocessor)
+    runner.main()
 
 }
