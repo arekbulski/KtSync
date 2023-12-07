@@ -24,20 +24,15 @@ class MainRunner (
             successfulBytes = 0
             failedEntries = 0
         }
-        val terminal = process.terminal!!
 
         try {
             subprocessor.backupProcess(process)
-            terminal.println((brightGreen)("Done."))
             exitProcess(0)
         } catch (e: FailedException) {
-            terminal.println((brightRed)("Aborting."))
             exitProcess(1)
         } catch (e: PartiallyFailedException) {
-            terminal.println((brightYellow)("Aborting."))
             exitProcess(1)
         } catch (e: Exception) {
-            terminal.println((brightRed)("Aborting."))
             exitProcess(1)
         }
     }

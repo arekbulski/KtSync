@@ -13,10 +13,9 @@ class PrettyPrintAlgorithm (
         val terminal = process.terminal!!
 
         terminal.println(Markdown("""
-            ## Debug
-            Beginning a test run (a hard-coded operation).
-            $process
-            
+            ## Preface
+            KtSync is starting to backup your files. You chose to backup the folder ${(brightWhite)(process.profile!!.sourcePath!!)} into the folder ${(brightWhite)(process.profile!!.destinationPath!!)} using the ${(brightWhite)("Full Backup algorithm")}. If the destination already exists, it will be safely renamed, do not worry about that.
+            ## Progress
         """.trimIndent()))
 
         passthrough({
@@ -24,15 +23,27 @@ class PrettyPrintAlgorithm (
 
             // TODO: Print next section?
         }, {
-            terminal.println((brightGreen)("All done. Everything, ${(brightWhite)("${process.successfulEntries} files/folders")} totaling ${(brightWhite)(suffixedSize(process.successfulBytes))}, was backed up."))
+            terminal.println(Markdown("""
+                ## Summary
+                ${(brightGreen)("All done. Everything, ${(brightWhite)("${process.successfulEntries} files/folders")} totaling ${(brightWhite)(suffixedSize(process.successfulBytes))}, was backed up.")}
+            """.trimIndent()))
         }, {
-            terminal.println((brightYellow)("Backup has partially failed. ${(brightWhite)("${process.successfulEntries} files/folders")} totaling ${(brightWhite)(suffixedSize(process.successfulBytes))} were successfully backed up, however ${(brightWhite)("${process.failedEntries} files/folders")} were not backed up."))
+            terminal.println(Markdown("""
+                ## Summary
+                ${(brightYellow)("Backup has partially failed. ${(brightWhite)("${process.successfulEntries} files/folders")} totaling ${(brightWhite)(suffixedSize(process.successfulBytes))} were successfully backed up, however ${(brightWhite)("${process.failedEntries} files/folders")} were not backed up.")}
+            """.trimIndent()))
             throw it
         }, {
-            terminal.println((brightRed)("Backup has entirely failed due to $it. Destination folder is in indeterminate state."))
+            terminal.println(Markdown("""
+                ## Summary
+                ${(brightRed)("Backup has entirely failed due to $it. Destination folder is in indeterminate state.")}
+            """.trimIndent()))
             throw it
         }, {
-            terminal.println((brightRed)("Backup has entirely failed due to unknown exception $it. Destination folder is in indeterminate state."))
+            terminal.println(Markdown("""
+                ## Summary
+                ${(brightRed)("Backup has entirely failed due to unknown exception $it. Destination folder is in indeterminate state.")}
+            """.trimIndent()))
             throw it
         })
     }
