@@ -52,10 +52,24 @@ class FullBackupAlgorithm (
             }
         }
 
-        if (! subprocessor.createFolder(destinationPath))
-            throw FailedException("Destination folder $destinationPath failed to create.", null, this)
-
         subprocessor.backupFolder(folder)
+
+        passthrough({
+            if (! subprocessor.createFolder(destinationPath))
+                throw FailedException("Destination folder $destinationPath failed to create.", null, this)
+        },{
+            subprocessor.finishFolder(folder, true, null)
+        }, {
+            // Under no scenario can this happen.
+            subprocessor.finishFolder(folder, null, it.description)
+            throw it
+        }, {
+            subprocessor.finishFolder(folder, false, it.description)
+            throw it
+        }, {
+            subprocessor.finishFolder(folder, false, it.toString())
+            throw it
+        })
 
         val entries = subprocessor.listFolderEntries(sourcePath)
         var partiallyFailed = 0

@@ -12,6 +12,10 @@ abstract class Processor {
         throw NotImplementedError()
     }
 
+    open fun finishFolder (folder: ProcessingFile, success: Boolean?, description: String?) {
+        throw NotImplementedError()
+    }
+
     open fun finishFile (file: ProcessingFile, success: Boolean?, description: String?) {
         throw NotImplementedError()
     }

@@ -26,6 +26,20 @@ class PrettyPrintFiles (
         subprocessor.backupFolder(folder)
     }
 
+    override fun finishFolder(folder: ProcessingFile, success: Boolean?, description: String?) {
+        val terminal = folder.process!!.terminal!!
+
+        if (success == true) {
+            terminal.println((brightGreen)("   (created)"))
+        }
+        if (success == false) {
+            terminal.println((brightRed)("   ($description)"))
+        }
+        // Under no scenario can this happen.
+        if (success == null)
+            terminal.println((brightYellow)("   ($description)"))
+    }
+
     override fun backupFile(file: ProcessingFile) {
         val terminal = file.process!!.terminal!!
 
