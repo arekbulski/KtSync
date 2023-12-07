@@ -19,6 +19,8 @@ class PrettyPrintAlgorithm (
 
         passthrough({
             subprocessor.backupProcess(process)
+
+            // TODO: Print next section?
         }, {
             terminal.println((brightGreen)("All done. Everything, ${(brightWhite)("${process.successfulEntries} files")} totaling ${(brightWhite)("${process.successfulBytes} bytes")}, is backed up."))
         }, {

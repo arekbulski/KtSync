@@ -15,8 +15,10 @@ class PrettyPrintFiles (
     override fun backupFolder(folder: ProcessingFile) {
         val terminal = folder.process!!.terminal!!
 
+        val relativePath = subprocessor.relative(folder.sourcePath!!,
+            subprocessor.canonical(folder.process!!.profile!!.sourcePath!!))
         terminal.println(Markdown("""
-            * ${(brightWhite)(folder.sourcePath!!)} a folder 
+            * ${(brightWhite)(relativePath)} a folder 
         """.trimIndent()))
 
         subprocessor.backupFolder(folder)
@@ -28,8 +30,10 @@ class PrettyPrintFiles (
     override fun backupFile(file: ProcessingFile) {
         val terminal = file.process!!.terminal!!
 
+        val relativePath = subprocessor.relative(file.sourcePath!!,
+            subprocessor.canonical(file.process!!.profile!!.sourcePath!!))
         terminal.println(Markdown("""
-            * ${(brightWhite)(file.sourcePath!!)} (size unknown) a regular file 
+            * ${(brightWhite)(relativePath)} (size unknown) a regular file 
         """.trimIndent()))
     }
 

@@ -1,5 +1,4 @@
 import java.io.File
-import java.nio.file.Files
 
 abstract class Processor {
 
@@ -20,6 +19,10 @@ abstract class Processor {
     }
 
     open fun resolve (pathname: String, relative: String): String {
+        throw NotImplementedError()
+    }
+
+    open fun relative (pathname: String, root: String): String {
         throw NotImplementedError()
     }
 

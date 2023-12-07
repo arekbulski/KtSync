@@ -31,6 +31,10 @@ class LocalDiskBackend (
         return File(pathname).resolve(relative).canonicalPath
     }
 
+    override fun relative(pathname: String, base: String): String {
+        return "/" + File(pathname).toRelativeString(File(base))
+    }
+
     override fun extractName(pathname: String): String {
         return File(pathname).name
     }
