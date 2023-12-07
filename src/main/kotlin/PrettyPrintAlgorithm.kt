@@ -24,9 +24,9 @@ class PrettyPrintAlgorithm (
 
             // TODO: Print next section?
         }, {
-            terminal.println((brightGreen)("All done. Everything, ${(brightWhite)("${process.successfulEntries} files/folders")} totaling ${(brightWhite)("${process.successfulBytes} bytes")}, was backed up."))
+            terminal.println((brightGreen)("All done. Everything, ${(brightWhite)("${process.successfulEntries} files/folders")} totaling ${(brightWhite)(suffixedSize(process.successfulBytes))}, was backed up."))
         }, {
-            terminal.println((brightYellow)("Backup has partially failed. ${(brightWhite)("${process.successfulEntries} files/folders")} totaling ${(brightWhite)("${process.successfulBytes} bytes")} were successfully backed up, however ${(brightWhite)("${process.failedEntries} files/folders")} were not backed up."))
+            terminal.println((brightYellow)("Backup has partially failed. ${(brightWhite)("${process.successfulEntries} files/folders")} totaling ${(brightWhite)(suffixedSize(process.successfulBytes))} were successfully backed up, however ${(brightWhite)("${process.failedEntries} files/folders")} were not backed up."))
             throw it
         }, {
             terminal.println((brightRed)("Backup has entirely failed due to $it. Destination folder is in indeterminate state."))

@@ -24,7 +24,7 @@ class PrettyPrintFiles (
         subprocessor.backupFolder(folder)
 
         // TODO: This wont work correctly in other, failure cases.
-        terminal.println("${(brightGreen)("(done)")}")
+        terminal.println((brightGreen)("(done)"))
     }
 
     override fun backupFile(file: ProcessingFile) {
@@ -34,7 +34,7 @@ class PrettyPrintFiles (
             subprocessor.canonical(file.process!!.profile!!.sourcePath!!))
         val size = file.size!!
         terminal.println(Markdown("""
-            * ${(brightWhite)(relativePath)} (${(brightWhite)("${size} bytes")}) a regular file 
+            * ${(brightWhite)(relativePath)} (${(brightWhite)(suffixedSize(size))}) a regular file 
         """.trimIndent()))
     }
 
