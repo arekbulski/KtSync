@@ -22,6 +22,10 @@ abstract class Passthrough(
         return subprocessor.resolve(pathname, relative)
     }
 
+    override fun relative(pathname: String, root: String): String {
+        return subprocessor.relative(pathname, root)
+    }
+
     override fun extractName(pathname: String): String {
         return subprocessor.extractName(pathname)
     }
@@ -56,6 +60,10 @@ abstract class Passthrough(
 
     override fun listFolderEntries(pathname: String): List<String> {
         return subprocessor.listFolderEntries(pathname)
+    }
+
+    override fun getSize(pathname: String): Long {
+        return subprocessor.getSize(pathname)
     }
 
     @ExperimentalUnsignedTypes

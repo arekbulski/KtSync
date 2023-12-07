@@ -2,6 +2,7 @@ import java.io.File
 import java.nio.file.Files
 import java.nio.file.LinkOption
 import java.nio.file.StandardOpenOption
+import kotlin.io.path.fileSize
 
 class LocalDiskBackend (
     val subprocessor: Processor
@@ -71,6 +72,10 @@ class LocalDiskBackend (
         // TODO: Maybe absolutepath ?
         return File(pathname).listFiles()?.map{ it.canonicalPath }
             ?: throw FailedException("Folder $pathname failed to list entries.")
+    }
+
+    override fun getSize(pathname: String): Long {
+        return File(pathname).toPath().fileSize()
     }
 
     @ExperimentalUnsignedTypes

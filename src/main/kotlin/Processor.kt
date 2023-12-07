@@ -62,6 +62,10 @@ abstract class Processor {
         throw NotImplementedError()
     }
 
+    open fun getSize (pathname: String): Long {
+        throw NotImplementedError()
+    }
+
     @ExperimentalUnsignedTypes
     open fun readFileContent (pathname: String): UByteArray {
         throw NotImplementedError()

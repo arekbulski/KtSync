@@ -32,8 +32,9 @@ class PrettyPrintFiles (
 
         val relativePath = subprocessor.relative(file.sourcePath!!,
             subprocessor.canonical(file.process!!.profile!!.sourcePath!!))
+        val size = file.size!!
         terminal.println(Markdown("""
-            * ${(brightWhite)(relativePath)} (size unknown) a regular file 
+            * ${(brightWhite)(relativePath)} (${(brightWhite)("${size} bytes")}) a regular file 
         """.trimIndent()))
     }
 

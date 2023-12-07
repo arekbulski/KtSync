@@ -71,6 +71,8 @@ class FullBackupAlgorithm (
                     this.isRoot = false
                     this.isRegularFile = subprocessor.isRegularFile(entry)
                     this.isFolder = subprocessor.isDirectory(entry)
+                    if (this.isRegularFile == true)
+                        this.size = subprocessor.getSize(entry)
                 }
                 if (subprocessing.isFolder == true) {
                     this.backupFolder(subprocessing)
@@ -79,8 +81,7 @@ class FullBackupAlgorithm (
                 if (subprocessing.isRegularFile == true) {
                     this.backupFile(subprocessing)
                     (folder.process!!).successfulEntries++
-                    // TODO: File size to be determined.
-                    (folder.process!!).successfulBytes += 1024
+                    (folder.process!!).successfulBytes += subprocessing.size!!
                 }
                 if ((subprocessing.isRegularFile != true) && (subprocessing.isFolder != true)) {
                     throw FailedException("Source entry $entry is not a regular file nor a folder.", null, this)
@@ -88,8 +89,8 @@ class FullBackupAlgorithm (
             } catch (e: PartiallyFailedException) {
                 partiallyFailed++
                 (folder.process!!).failedEntries++
-                // TODO: File size to be determined.
-                (folder.process!!).failedBytes += 1024
+                // TODO: Unobtainable file size.
+                (folder.process!!).failedBytes += 0
             }
         }
 
@@ -103,6 +104,7 @@ class FullBackupAlgorithm (
         val sourcePath = file.sourcePath!!
         val destinationPath = file.destinationPath!!
 
+        // TODO: Are those really needed?
         if (file.isRoot == true)
             throw IllegalStateException("isRoot should be false or null.")
         if (! subprocessor.exists(sourcePath))
