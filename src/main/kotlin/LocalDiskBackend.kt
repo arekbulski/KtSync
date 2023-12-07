@@ -20,8 +20,8 @@ class LocalDiskBackend (
         subprocessor.backupFile(file)
     }
 
-    override fun canonical (pathname: String): String {
-        return File(pathname).canonicalPath
+    override fun absolute (pathname: String): String {
+        return File(pathname).absolutePath
     }
 
     override fun resolve(pathname: String, relative: String): String {

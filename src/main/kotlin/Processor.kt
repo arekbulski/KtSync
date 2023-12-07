@@ -20,7 +20,7 @@ abstract class Processor {
         throw NotImplementedError()
     }
 
-    open fun canonical (pathname: String): String {
+    open fun absolute (pathname: String): String {
         throw NotImplementedError()
     }
 

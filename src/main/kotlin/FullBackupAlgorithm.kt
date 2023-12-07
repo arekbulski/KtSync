@@ -19,8 +19,8 @@ class FullBackupAlgorithm (
 
         val root = ProcessingFile().apply {
             this.process = process
-            this.sourcePath = subprocessor.canonical(sourcePath)
-            this.destinationPath = subprocessor.canonical(destinationPath)
+            this.sourcePath = subprocessor.absolute(sourcePath)
+            this.destinationPath = subprocessor.absolute(destinationPath)
             this.isRoot = true
         }
 

@@ -22,8 +22,8 @@ abstract class Passthrough(
         subprocessor.finishFile(file, success, description)
     }
 
-    override fun canonical(pathname: String): String {
-        return subprocessor.canonical(pathname)
+    override fun absolute(pathname: String): String {
+        return subprocessor.absolute(pathname)
     }
 
     override fun resolve(pathname: String, relative: String): String {

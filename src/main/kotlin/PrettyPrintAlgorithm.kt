@@ -34,7 +34,7 @@ class PrettyPrintAlgorithm (
                 ## Issues
             """.trimIndent()))
             for ((path,reason) in process.failedEntries) {
-                val relativePath = subprocessor.relative(path, subprocessor.canonical(process.profile!!.sourcePath!!))
+                val relativePath = subprocessor.relative(path, subprocessor.absolute(process.profile!!.sourcePath!!))
                 terminal.println(Markdown("""
                     * ${(brightWhite)(relativePath)} was not backed up.
                 """.trimIndent()))

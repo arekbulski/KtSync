@@ -16,7 +16,7 @@ class PrettyPrintFiles (
         val terminal = folder.process!!.terminal!!
 
         val relativePath = subprocessor.relative(folder.sourcePath!!,
-            subprocessor.canonical(folder.process!!.profile!!.sourcePath!!))
+            subprocessor.absolute(folder.process!!.profile!!.sourcePath!!))
         terminal.println(Markdown("""
             * ${(brightWhite)(relativePath)} a folder 
         """.trimIndent()))
@@ -42,7 +42,7 @@ class PrettyPrintFiles (
         val terminal = file.process!!.terminal!!
 
         val relativePath = subprocessor.relative(file.sourcePath!!,
-            subprocessor.canonical(file.process!!.profile!!.sourcePath!!))
+            subprocessor.absolute(file.process!!.profile!!.sourcePath!!))
         if (file.isRegularFile == true) {
             val size = file.size!!
             terminal.println(Markdown("""
