@@ -15,6 +15,8 @@ class PrettyPrintAlgorithm (
         terminal.println(Markdown("""
             ## Debug
             Beginning a test run (a hard-coded operation).
+            ${process}
+            
         """.trimIndent()))
 
         passthrough({
