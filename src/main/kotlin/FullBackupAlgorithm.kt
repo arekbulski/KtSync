@@ -13,6 +13,7 @@ class FullBackupAlgorithm (
         // Currently this does nothing.
         subprocessor.backupProcess(process)
 
+        // TODO: Change semantics. Allow top-level folders to be symbolic links. Just print a warning?
         if (subprocessor.isSymbolicLink(sourcePath))
             throw FailedException("Source folder $sourcePath is a symbolic link.")
         if (subprocessor.isSymbolicLink(destinationPath))
@@ -74,8 +75,9 @@ class FullBackupAlgorithm (
             throw it
         })
 
+        val process = folder.process!!
         val entries = subprocessor.listFolderEntries(sourcePath)
-        var partiallyFailed = 0
+        var partiallyFailed = 0L
 
         for (entry in entries) {
             try {
@@ -91,16 +93,16 @@ class FullBackupAlgorithm (
                 }
                 if (subprocessing.isFolder == true) {
                     this.backupFolder(subprocessing)
-                    (folder.process!!).successfulEntries++
+                    process.successfulEntries++
                 } else {
                     this.backupFile(subprocessing)
-                    (folder.process!!).successfulEntries++
-                    (folder.process!!).successfulBytes += subprocessing.size!!
+                    process.successfulEntries++
+                    process.successfulBytes += subprocessing.size!!
                 }
             } catch (e: PartiallyFailedException) {
                 partiallyFailed++
-                (folder.process!!).failedEntriesCount++
-                (folder.process!!).failedEntries[entry] = e.description!!
+                process.failedEntriesCount++
+                process.failedEntries[entry] = e.description!!
             }
         }
 

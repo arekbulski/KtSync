@@ -26,12 +26,13 @@ class PrettyPrintFiles (
         if (success == true) {
             terminal.println((brightGreen)("   (created)"))
         }
+        // Under no scenario can this happen.
+        if (success == null) {
+            terminal.println((brightYellow)("   ($description)"))
+        }
         if (success == false) {
             terminal.println((brightRed)("   ($description)"))
         }
-        // Under no scenario can this happen.
-        if (success == null)
-            terminal.println((brightYellow)("   ($description)"))
     }
 
     override fun backupFile(file: ProcessingFile) {
