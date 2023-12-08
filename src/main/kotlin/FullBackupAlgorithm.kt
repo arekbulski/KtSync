@@ -15,9 +15,9 @@ class FullBackupAlgorithm (
 
         // TODO: Change semantics. Allow top-level folders to be symbolic links. Just print a warning?
         if (subprocessor.isSymbolicLink(sourcePath))
-            throw FailedException("Source folder $sourcePath is a symbolic link.")
+            throw TotallyFailedException("Source folder $sourcePath is a symbolic link.")
         if (subprocessor.isSymbolicLink(destinationPath))
-            throw FailedException("Destination folder $destinationPath is a symbolic link.")
+            throw TotallyFailedException("Destination folder $destinationPath is a symbolic link.")
 
         val root = ProcessingFile().apply {
             this.process = process
@@ -35,20 +35,20 @@ class FullBackupAlgorithm (
         val destinationPath = folder.destinationPath!!
 
         if (! subprocessor.exists(sourcePath))
-            throw FailedException("Source folder $sourcePath does not exist.", this)
+            throw TotallyFailedException("Source folder $sourcePath does not exist.", this)
         if (! subprocessor.isDirectory(sourcePath))
-            throw FailedException("Source folder $sourcePath is not a folder.", this)
+            throw TotallyFailedException("Source folder $sourcePath is not a folder.", this)
         folder.isFolder = true
         if (subprocessor.exists(destinationPath)) {
             if (folder.isRoot == true) {
                 val datetime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss"))
                 val destinationRenamed = "${destinationPath}-trash-$datetime"
                 if (! subprocessor.renameTo(destinationPath, destinationRenamed))
-                    throw FailedException("Destination folder $destinationPath could not be renamed.", this)
+                    throw TotallyFailedException("Destination folder $destinationPath could not be renamed.", this)
                 folder.process!!.destinationRenamedTo = subprocessor.extractName(destinationRenamed)
             }
             if (folder.isRoot == false) {
-                throw FailedException("Destination folder $destinationPath already exists.", this)
+                throw TotallyFailedException("Destination folder $destinationPath already exists.", this)
             }
             // Under no scenario can this happen.
             if (folder.isRoot == null) {
@@ -60,7 +60,7 @@ class FullBackupAlgorithm (
 
         propagate({
             if (! subprocessor.createFolder(destinationPath))
-                throw FailedException("Destination folder $destinationPath failed to create.", this)
+                throw TotallyFailedException("Destination folder $destinationPath failed to create.", this)
         },{
             subprocessor.finishFolder(folder, true, null)
         }, {
@@ -122,14 +122,14 @@ class FullBackupAlgorithm (
             if (file.isRoot == true)
                 throw IllegalStateException("isRoot should be false or null.")
             if (! subprocessor.exists(sourcePath))
-                throw FailedException("Source file $sourcePath does not exist.", this)
+                throw TotallyFailedException("Source file $sourcePath does not exist.", this)
             if (subprocessor.isSymbolicLink(sourcePath))
-                throw FailedException("Source file $sourcePath is a symbolic link.", this)
+                throw TotallyFailedException("Source file $sourcePath is a symbolic link.", this)
             if (! subprocessor.isRegularFile(sourcePath))
-                throw FailedException("Source file $sourcePath is not a regular file.", this)
+                throw TotallyFailedException("Source file $sourcePath is not a regular file.", this)
             file.isRegularFile = true
             if (subprocessor.exists(destinationPath))
-                throw FailedException("Destination file $destinationPath already exists.", this)
+                throw TotallyFailedException("Destination file $destinationPath already exists.", this)
 
             val data = subprocessor.readFileContent(sourcePath)
             subprocessor.writeFileContent(destinationPath, data)

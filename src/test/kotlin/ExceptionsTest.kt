@@ -7,8 +7,8 @@ class ExceptionsTest {
 
     @Test
     fun testToString() {
-        val e1 = FailedException("Description", null)
-        assert(e1.toString() == "FailedException (Description) thrown by null")
+        val e1 = TotallyFailedException("Description", null)
+        assert(e1.toString() == "TotallyFailedException (Description) thrown by null")
         val e2 = PartiallyFailedException("Description", null)
         assert(e2.toString() == "PartiallyFailedException (Description) thrown by null")
     }

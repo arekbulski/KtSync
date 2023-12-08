@@ -54,7 +54,7 @@ class LocalDiskBackend (
 
     override fun listFolderEntries(pathname: String): List<String> {
         return File(pathname).listFiles()?.map{ it.absolutePath }
-            ?: throw FailedException("Folder $pathname failed to list entries.")
+            ?: throw TotallyFailedException("Folder $pathname failed to list entries.")
     }
 
     override fun getSize(pathname: String): Long {

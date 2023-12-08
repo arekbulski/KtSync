@@ -85,13 +85,13 @@ abstract class Processor {
     fun propagate (action: () -> Unit,
                    onSuccess: (() -> Unit)? = null,
                    onPartiallyFailed: ((PartiallyFailedException) -> Unit)? = null,
-                   onFailed: ((FailedException) -> Unit)? = null,
+                   onFailed: ((TotallyFailedException) -> Unit)? = null,
                    onException: ((Exception) -> Unit)? = null, ) {
         try {
             action.invoke()
             onSuccess?.invoke()
         }
-        catch (e: FailedException) {
+        catch (e: TotallyFailedException) {
             onFailed?.invoke(e)
         }
         catch (e: PartiallyFailedException) {
