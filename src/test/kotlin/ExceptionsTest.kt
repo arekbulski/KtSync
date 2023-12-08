@@ -7,10 +7,14 @@ class ExceptionsTest {
 
     @Test
     fun testToString() {
-        val e1 = TotallyFailedException("Description", null)
-        assert(e1.toString() == "TotallyFailedException (Description) thrown by null")
-        val e2 = PartiallyFailedException("Description", null)
-        assert(e2.toString() == "PartiallyFailedException (Description) thrown by null")
+        val e1 = TotallyFailedException("Description")
+        assert(e1.toString() == "TotallyFailedException (Description)")
+        val e2 = PartiallyFailedException("Description")
+        assert(e2.toString() == "PartiallyFailedException (Description)")
+
+        val exception1 = Exception("Message")
+        val nested1 = TotallyFailedException("Description", DoNothing(), exception1)
+        assert(nested1.toString() == "TotallyFailedException (Description) (thrown by DoNothing) <-- java.lang.Exception: Message")
     }
 
     private fun callForException() {
@@ -22,7 +26,7 @@ class ExceptionsTest {
     }
 
     @Test
-    fun timeitExceptions() {
+    fun timeitExceptionVsResult() {
         val heavyExceptionTook = measureTime {
             try {
                 callForException()
