@@ -5,16 +5,17 @@ class ProcessingProcess {
 
     var profile: Profile? = null
     var terminal: Terminal? = null
-    var successfulEntries: Long = 0
+
+    var estimatedCount: Long = 0
+    var estimatedBytes: Long = 0
+    var processedCount: Long = 0
+    var processedBytes: Long = 0
+    var successfulCount: Long = 0
     var successfulBytes: Long = 0
-    var failedEntriesCount: Long = 0
-    var failedEntries = mutableMapOf<String,String>()
+    var failedEntries = mutableMapOf<String,Exception>()
+
     var destinationRenamedTo: String? = null
     var timeBegun: LocalDateTime? = null
     var timeEnded: LocalDateTime? = null
-
-    override fun toString(): String {
-        return "ProcessingProcess: $profile"
-    }
 
 }

@@ -12,6 +12,18 @@ fun suffixedSize (n: Long): String {
     return "${"%.1f".format(n/1024.0/1024.0/1024.0/1024.0)} TB"
 }
 
+fun suffixedThroughput (s: Double): String {
+    if (s < 1024L)
+        return "$s bytes/sec"
+    if (s < 1024*1024L)
+        return "${"%.1f".format(s/1024.0)} KB/sec"
+    if (s < 1024*1024*1024L)
+        return "${"%.1f".format(s/1024.0/1024.0)} MB/sec"
+    if (s < 1024*1024*1024*1024L)
+        return "${"%.1f".format(s/1024.0/1024.0/1024.0)} GB/sec"
+    return "${"%.1f".format(s/1024.0/1024.0/1024.0/1024.0)} TB/sec"
+}
+
 fun timeToHMS (d: Duration): String {
     val hh = d.seconds / 3600
     val mm = (d.seconds % 3600) / 60

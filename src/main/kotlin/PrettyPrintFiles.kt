@@ -3,6 +3,7 @@ import com.github.ajalt.mordant.rendering.TextColors.brightGreen
 import com.github.ajalt.mordant.rendering.TextColors.brightYellow
 import com.github.ajalt.mordant.rendering.TextColors.brightRed
 import com.github.ajalt.mordant.rendering.TextColors.brightWhite
+import com.github.ajalt.mordant.rendering.TextColors.brightMagenta
 
 class PrettyPrintFiles (
     subprocessor: Processor
@@ -33,6 +34,10 @@ class PrettyPrintFiles (
         if (success == false) {
             terminal.println((brightRed)("   ($description)"))
         }
+
+        val process = folder.process!!
+
+        terminal.println((brightMagenta)("progress is ${process.processedCount} ${suffixedSize(process.processedBytes)} out of ${process.estimatedCount} ${suffixedSize(process.estimatedBytes)}"))
     }
 
     override fun backupFile(file: ProcessingFile) {
@@ -41,9 +46,8 @@ class PrettyPrintFiles (
         val relativePath = subprocessor.relative(file.sourcePath!!,
             subprocessor.absolute(file.process!!.profile!!.sourcePath!!))
         if (file.isRegularFile == true) {
-            val size = file.size!!
             terminal.println(Markdown("""
-                * ${(brightWhite)(relativePath)} (${(brightWhite)(suffixedSize(size))}) a regular file 
+                * ${(brightWhite)(relativePath)} (${(brightWhite)(suffixedSize(file.size))}) a regular file 
             """.trimIndent()))
         } else {
             terminal.println(Markdown("""
@@ -63,6 +67,10 @@ class PrettyPrintFiles (
         }
         if (success == null)
             terminal.println((brightYellow)("   ($description)"))
+
+        val process = file.process!!
+
+        terminal.println((brightMagenta)("progress is ${process.processedCount} ${suffixedSize(process.processedBytes)} out of ${process.estimatedCount} ${suffixedSize(process.estimatedBytes)}"))
     }
 
 }

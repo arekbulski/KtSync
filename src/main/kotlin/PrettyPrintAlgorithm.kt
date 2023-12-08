@@ -26,10 +26,11 @@ class PrettyPrintAlgorithm (
         }, {
             process.timeEnded = LocalDateTime.now()
             val elapsed = Duration.between(process.timeBegun!!, process.timeEnded!!)
+            val throughput = process.successfulBytes.toDouble() / (elapsed.toMillis().toDouble() / 1000.0)
 
             terminal.println(Markdown("""
                 ## Summary
-                ${(brightGreen)("Backup was successful. ${(brightWhite)("${process.successfulEntries} files/folders")} totaling ${(brightWhite)(suffixedSize(process.successfulBytes))} were backed up.")}
+                ${(brightGreen)("Backup was successful. ${(brightWhite)("${process.successfulCount} files/folders")} totaling ${(brightWhite)(suffixedSize(process.successfulBytes))} were backed up.")}
             """.trimIndent()))
             if (process.destinationRenamedTo != null)
                 terminal.println(Markdown("""
@@ -38,22 +39,22 @@ class PrettyPrintAlgorithm (
                 """.trimIndent()))
             terminal.println(Markdown("""
                 
-                Entire process took ${(brightWhite)(timeToHMS(elapsed))}.
+                The average throughput was ${(brightWhite)(suffixedThroughput(throughput))} as sending ${(brightWhite)(suffixedSize(process.successfulBytes))} took you ${(brightWhite)(timeToHMS(elapsed))} time. Note that uplink speed is usually the minimum between source backend and destination backend, and rarely compression or encryption layer.
             """.trimIndent()))
 
         }, {
             terminal.println(Markdown("""
                 ## Issues
             """.trimIndent()))
-            for ((path,reason) in process.failedEntries) {
+            for ((path, exception) in process.failedEntries) {
                 val relativePath = subprocessor.relative(path, subprocessor.absolute(process.profile!!.sourcePath!!))
                 terminal.println(Markdown("""
-                    * ${(brightWhite)(relativePath)} was not backed up.
+                    * ${(brightWhite)(relativePath)} was not backed up due to ${(if (exception is TotallyFailedException) brightRed else brightYellow)(exception.toString())}.
                 """.trimIndent()))
             }
             terminal.println(Markdown("""
                 ## Summary
-                ${(brightYellow)("Backup was partially successful. ${(brightWhite)("${process.successfulEntries} files/folders")} totaling ${(brightWhite)(suffixedSize(process.successfulBytes))} were successfully backed up, however ${(brightWhite)("${process.failedEntriesCount} files/folders")} were not.")}
+                ${(brightYellow)("Backup was partially successful. ${(brightWhite)("${process.successfulCount} files/folders")} totaling ${(brightWhite)(suffixedSize(process.successfulBytes))} were successfully backed up, however ${(brightWhite)("${process.failedEntries.size} files/folders")} were not.")}
             """.trimIndent()))
             if (process.destinationRenamedTo != null)
                 terminal.println(Markdown("""
