@@ -1,3 +1,4 @@
+import com.github.ajalt.mordant.animation.progressAnimation
 import com.github.ajalt.mordant.markdown.Markdown
 import com.github.ajalt.mordant.rendering.TextColors.brightGreen
 import com.github.ajalt.mordant.rendering.TextColors.brightYellow
@@ -41,7 +42,8 @@ class PrettyPrintFiles (
     }
 
     override fun backupFile(file: ProcessingFile) {
-        val terminal = file.process!!.terminal!!
+        val process = file.process!!
+        val terminal = process.terminal!!
 
         val relativePath = subprocessor.relative(file.sourcePath!!,
             subprocessor.absolute(file.process!!.profile!!.sourcePath!!))
@@ -49,6 +51,15 @@ class PrettyPrintFiles (
             terminal.println(Markdown("""
                 * ${(brightWhite)(relativePath)} (${(brightWhite)(suffixedSize(file.size))}) a regular file 
             """.trimIndent()))
+            val progressbar = terminal.progressAnimation {
+                progressBar()
+                completed(includeTotal = true)
+                speed("bytes/sec")
+                timeRemaining()
+            }
+            progressbar.start()
+            progressbar.update(process.processedBytes, process.estimatedBytes)
+            process.progressbar = progressbar
         } else {
             terminal.println(Markdown("""
                 * ${(brightWhite)(relativePath)} unknown type
@@ -57,18 +68,26 @@ class PrettyPrintFiles (
     }
 
     override fun finishFile(file: ProcessingFile, success: Boolean?, description: String?) {
-        val terminal = file.process!!.terminal!!
+        val process = file.process!!
+        val terminal = process.terminal!!
+        val progressbar = process.progressbar!!
+
+        repeat(10) {
+            Thread.sleep(100)
+            progressbar.update()
+        }
+        progressbar.clear()
+        process.progressbar = null
 
         if (success == true) {
             terminal.println((brightGreen)("   (done)"))
         }
+        if (success == null) {
+            terminal.println((brightYellow)("   ($description)"))
+        }
         if (success == false) {
             terminal.println((brightRed)("   ($description)"))
         }
-        if (success == null)
-            terminal.println((brightYellow)("   ($description)"))
-
-        val process = file.process!!
 
         terminal.println((brightMagenta)("progress is ${process.processedCount} ${suffixedSize(process.processedBytes)} out of ${process.estimatedCount} ${suffixedSize(process.estimatedBytes)}"))
     }

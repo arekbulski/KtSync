@@ -1,3 +1,4 @@
+import com.github.ajalt.mordant.animation.ProgressAnimation
 import com.github.ajalt.mordant.terminal.Terminal
 import java.time.LocalDateTime
 
@@ -5,6 +6,7 @@ class ProcessingProcess {
 
     var profile: Profile? = null
     var terminal: Terminal? = null
+    var progressbar: ProgressAnimation? = null
 
     var estimatedCount: Long = 0
     var estimatedBytes: Long = 0
