@@ -9,66 +9,126 @@ class LocalDiskBackend (
 ) : Passthrough(subprocessor) {
 
     override fun absolute (pathname: String): String {
-        return File(pathname).absolutePath
+        try {
+            return File(pathname).absolutePath
+        } catch (e: Exception) {
+            throw TotallyFailedException("Failed to evaluate absolute path $pathname.", this, e)
+        }
     }
 
     override fun resolve(pathname: String, relative: String): String {
-        return File(pathname).resolve(relative).absolutePath
+        try {
+            return File(pathname).resolve(relative).absolutePath
+        } catch (e: Exception) {
+            throw TotallyFailedException("Failed to evaluate resolved path $pathname with relative $relative.", this, e)
+        }
     }
 
     override fun relative(pathname: String, base: String): String {
-        return "/" + File(pathname).toRelativeString(File(base))
+        try {
+            return "/" + File(pathname).toRelativeString(File(base))
+        } catch (e: Exception) {
+            throw TotallyFailedException("Failed to evaluate relative path $pathname with base $base.", this, e)
+        }
     }
 
     override fun extractName(pathname: String): String {
-        return File(pathname).name
+        try {
+            return File(pathname).name
+        } catch (e: Exception) {
+            throw TotallyFailedException("Failed to extract name from path $pathname.", this, e)
+        }
     }
 
     override fun exists (pathname: String): Boolean {
-        return Files.exists(File(pathname).toPath(), LinkOption.NOFOLLOW_LINKS)
+        try {
+            return Files.exists(File(pathname).toPath(), LinkOption.NOFOLLOW_LINKS)
+        } catch (e: Exception) {
+            throw TotallyFailedException("Failed to check if path exists $pathname.", this, e)
+        }
     }
 
     override fun isRegularFile(pathname: String): Boolean {
-        return Files.isRegularFile(File(pathname).toPath(), LinkOption.NOFOLLOW_LINKS)
+        try {
+            return Files.isRegularFile(File(pathname).toPath(), LinkOption.NOFOLLOW_LINKS)
+        } catch (e: Exception) {
+            throw TotallyFailedException("Failed to check if a regular file $pathname.", this, e)
+        }
     }
 
     override fun isDirectory(pathname: String): Boolean {
-        return Files.isDirectory(File(pathname).toPath(), LinkOption.NOFOLLOW_LINKS)
+        try {
+            return Files.isDirectory(File(pathname).toPath(), LinkOption.NOFOLLOW_LINKS)
+        } catch (e: Exception) {
+            throw TotallyFailedException("Failed to check if a directory $pathname.", this, e)
+        }
     }
 
     override fun isSymbolicLink (pathname: String): Boolean {
-        return Files.isSymbolicLink(File(pathname).toPath())
+        try {
+            return Files.isSymbolicLink(File(pathname).toPath())
+        } catch (e: Exception) {
+            throw TotallyFailedException("Failed to check if a symbolic link $pathname.", this, e)
+        }
     }
 
     override fun renameTo(pathname: String, newname: String): Boolean {
-        return File(pathname).renameTo(File(newname))
+        try {
+            return File(pathname).renameTo(File(newname))
+        } catch (e: Exception) {
+            throw TotallyFailedException("Failed to rename $pathname into $newname.", this, e)
+        }
     }
 
     override fun createFolder(pathname: String): Boolean {
-        return File(pathname).mkdir()
+        try {
+            return File(pathname).mkdir()
+        } catch (e: Exception) {
+            throw TotallyFailedException("Failed to create a folder $pathname.", this, e)
+        }
     }
 
     override fun createRegularFile(pathname: String): Boolean {
-        return File(pathname).createNewFile()
+        try {
+            return File(pathname).createNewFile()
+        } catch (e: Exception) {
+            throw TotallyFailedException("Failed to create a regular file $pathname.", this, e)
+        }
     }
 
     override fun listFolderEntries(pathname: String): List<String> {
-        return File(pathname).listFiles()?.map{ it.absolutePath }
-            ?: throw TotallyFailedException("Folder $pathname failed to list entries.")
+        try {
+            return File(pathname).listFiles()?.map{ it.absolutePath }
+                ?: throw TotallyFailedException("Failed to list entries in folder $pathname.")
+        } catch (e: Exception) {
+            throw TotallyFailedException("Failed to list entries in folder $pathname.", this, e)
+        }
     }
 
     override fun getSize(pathname: String): Long {
-        return File(pathname).toPath().fileSize()
+        try {
+            return File(pathname).toPath().fileSize()
+        } catch (e: Exception) {
+            throw TotallyFailedException("Failed to get file size of $pathname.", this, e)
+        }
     }
 
     @ExperimentalUnsignedTypes
     override fun readFileContent (pathname: String): UByteArray {
-        return Files.readAllBytes(File(pathname).toPath()).asUByteArray()
+        try {
+            return Files.readAllBytes(File(pathname).toPath()).asUByteArray()
+        } catch (e: Exception) {
+            throw TotallyFailedException("Failed to read content of file $pathname.", this, e)
+        }
     }
 
     @ExperimentalUnsignedTypes
     override fun writeFileContent(pathname: String, data: UByteArray) {
-        Files.write(File(pathname).toPath(), data.asByteArray(), StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE)
+        try {
+            Files.write(File(pathname).toPath(), data.asByteArray(), StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE)
+        } catch (e: Exception) {
+            throw TotallyFailedException("Failed to write ${data.size} bytes content into file $pathname.", this, e)
+        }
     }
 
 }
