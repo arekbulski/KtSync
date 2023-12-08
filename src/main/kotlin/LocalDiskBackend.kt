@@ -99,7 +99,9 @@ class LocalDiskBackend (
     override fun listFolderEntries(pathname: String): List<String> {
         try {
             return File(pathname).listFiles()?.map{ it.absolutePath }
-                ?: throw TotallyFailedException("Failed to list entries in folder $pathname.")
+                ?: throw TotallyFailedException("Failed to list entries in folder $pathname.", this, null)
+        } catch (e: TotallyFailedException) {
+            throw e
         } catch (e: Exception) {
             throw TotallyFailedException("Failed to list entries in folder $pathname.", this, e)
         }
@@ -127,7 +129,7 @@ class LocalDiskBackend (
         try {
             Files.write(File(pathname).toPath(), data.asByteArray(), StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE)
         } catch (e: Exception) {
-            throw TotallyFailedException("Failed to write ${data.size} bytes content into file $pathname.", this, e)
+            throw TotallyFailedException("Failed to create/write ${data.size} bytes content into file $pathname.", this, e)
         }
     }
 
