@@ -1,3 +1,4 @@
+import com.github.ajalt.mordant.animation.progressAnimation
 import com.github.ajalt.mordant.markdown.Markdown
 import com.github.ajalt.mordant.rendering.TextColors.brightGreen
 import com.github.ajalt.mordant.rendering.TextColors.brightYellow

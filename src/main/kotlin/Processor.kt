@@ -20,7 +20,19 @@ abstract class Processor {
         throw NotImplementedError()
     }
 
-    open fun estimateFolder (folder: String): FullBackupAlgorithm.EstimatedPair {
+    open fun estimateFolder (process: ProcessingProcess, folder: String) {
+        throw NotImplementedError()
+    }
+
+    open fun initEstimationProgress (process: ProcessingProcess) {
+        throw NotImplementedError()
+    }
+
+    open fun updateEstimationProgress (process: ProcessingProcess) {
+        throw NotImplementedError()
+    }
+
+    open fun finishEstimationProgress (process: ProcessingProcess) {
         throw NotImplementedError()
     }
 

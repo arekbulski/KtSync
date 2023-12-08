@@ -23,6 +23,7 @@ class PrettyPrintFiles (
     }
 
     override fun finishFolder(folder: ProcessingFile, success: Boolean?, description: String?) {
+        val process = folder.process!!
         val terminal = folder.process!!.terminal!!
 
         if (success == true) {
@@ -36,9 +37,7 @@ class PrettyPrintFiles (
             terminal.println((brightRed)("   ($description)"))
         }
 
-        val process = folder.process!!
-
-        terminal.println((brightMagenta)("progress is ${process.processedCount} ${suffixedSize(process.processedBytes)} out of ${process.estimatedCount} ${suffixedSize(process.estimatedBytes)}"))
+//        terminal.println((brightMagenta)("progress is ${process.processedCount} ${suffixedSize(process.processedBytes)} out of ${process.estimatedCount} ${suffixedSize(process.estimatedBytes)}"))
     }
 
     override fun backupFile(file: ProcessingFile) {
@@ -76,6 +75,7 @@ class PrettyPrintFiles (
             Thread.sleep(100)
             progressbar.update()
         }
+
         progressbar.clear()
         process.progressbar = null
 
@@ -89,7 +89,43 @@ class PrettyPrintFiles (
             terminal.println((brightRed)("   ($description)"))
         }
 
-        terminal.println((brightMagenta)("progress is ${process.processedCount} ${suffixedSize(process.processedBytes)} out of ${process.estimatedCount} ${suffixedSize(process.estimatedBytes)}"))
+//        terminal.println((brightMagenta)("progress is ${process.processedCount} ${suffixedSize(process.processedBytes)} out of ${process.estimatedCount} ${suffixedSize(process.estimatedBytes)}"))
+    }
+
+    override fun initEstimationProgress(process: ProcessingProcess) {
+        val terminal = process.terminal!!
+
+        terminal.println(Markdown("""
+            Estimating a total amount of files and bytes to backup...
+        """.trimIndent()))
+        val progressbar = terminal.progressAnimation {
+            progressBar()
+            completed(suffix = " files", includeTotal = false)
+        }
+        progressbar.start()
+        process.progressbar = progressbar
+    }
+
+    override fun updateEstimationProgress(process: ProcessingProcess) {
+        val terminal = process.terminal!!
+        val progressbar = process.progressbar!!
+
+        progressbar.update(process.estimatedCount)
+
+        repeat(10) {
+            Thread.sleep(25)
+            progressbar.update()
+        }
+    }
+
+    override fun finishEstimationProgress(process: ProcessingProcess) {
+        val terminal = process.terminal!!
+        val progressbar = process.progressbar!!
+
+        progressbar.clear()
+        process.progressbar = null
+        terminal.println("Found ${(brightWhite)("${process.estimatedCount} files")} totaling ${(brightWhite)(suffixedSize(process.estimatedBytes))}.")
+        terminal.println()
     }
 
 }

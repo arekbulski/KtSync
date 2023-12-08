@@ -13,9 +13,9 @@ class FullBackupAlgorithm (
         // Currently this does nothing.
         subprocessor.backupProcess(process)
 
-        val estimated = this.estimateFolder(sourcePath)
-        process.estimatedCount = estimated.totalCount
-        process.estimatedBytes = estimated.totalBytes
+        subprocessor.initEstimationProgress(process)
+        this.estimateFolder(process, sourcePath)
+        subprocessor.finishEstimationProgress(process)
 
         // TODO: Change semantics. Allow top-level folders to be symbolic links. Just print a warning?
         if (subprocessor.isSymbolicLink(sourcePath))
@@ -173,30 +173,26 @@ class FullBackupAlgorithm (
         })
     }
 
-    data class EstimatedPair (val totalCount: Long, val totalBytes: Long)
+    override fun estimateFolder(process: ProcessingProcess, folder: String) {
+        process.estimatedCount = 0
+        process.estimatedBytes = 0
+        val queue = arrayListOf(subprocessor.absolute(folder))
 
-    override fun estimateFolder(folder: String): EstimatedPair {
-        var count = 0L
-        var bytes = 0L
-        val entries = subprocessor.listFolderEntries(folder)
-        for (entry in entries) {
-            try {
-                if (subprocessor.isFolder(entry)) {
-                    val sub = estimateFolder(entry)
-                    count += sub.totalCount + 1
-                    bytes += sub.totalBytes
-                } else
-                if (subprocessor.isRegularFile(entry)) {
-                    count++
-                    bytes += subprocessor.getSize(entry)
-                } else {
-                    count++
-                }
-            } catch (e: PartiallyFailedException) {
-                count++
+        while (queue.isNotEmpty()) {
+            val entry = queue.removeAt(0)
+            if (subprocessor.isFolder(entry)) {
+                process.estimatedCount++
+                queue.addAll(subprocessor.listFolderEntries(entry))
             }
+            if (subprocessor.isRegularFile(entry)) {
+                process.estimatedCount++
+                process.estimatedBytes += subprocessor.getSize(entry)
+            }
+
+            subprocessor.updateEstimationProgress(process)
         }
-        return EstimatedPair(count, bytes)
+
+        process.estimatedCount--
     }
 
 }
