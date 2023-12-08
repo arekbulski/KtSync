@@ -26,7 +26,8 @@ class PrettyPrintAlgorithm (
         }, {
             process.timeEnded = LocalDateTime.now()
             val elapsed = Duration.between(process.timeBegun!!, process.timeEnded!!)
-            val throughput = process.successfulBytes.toDouble() / (elapsed.toMillis().toDouble() / 1000.0)
+            val throughputInBytes = process.successfulBytes / (elapsed.toMillis().toDouble() / 1000.0)
+            val throughputInFiles = (process.successfulCount / (elapsed.toMillis().toDouble() / 1000.0)).toLong()
 
             terminal.println(Markdown("""
                 ## Summary
@@ -39,7 +40,7 @@ class PrettyPrintAlgorithm (
                 """.trimIndent()))
             terminal.println(Markdown("""
                 
-                The average throughput was ${(brightWhite)(suffixedThroughput(throughput))} as sending ${(brightWhite)(suffixedSize(process.successfulBytes))} took you ${(brightWhite)(timeToHMS(elapsed))} time. Note that uplink speed is usually the minimum between source backend and destination backend, and rarely compression or encryption layer.
+                The average throughput was ${(brightWhite)(suffixedThroughput(throughputInBytes))} (or ${(brightWhite)("$throughputInFiles files/sec")}) as sending ${(brightWhite)(suffixedSize(process.successfulBytes))} (or ${(brightWhite)("${process.successfulCount} files")}) took you ${(brightWhite)(timeToHMS(elapsed))} time.
             """.trimIndent()))
 
         }, {
