@@ -56,7 +56,7 @@ class LocalDiskBackend (
         }
     }
 
-    override fun isDirectory(pathname: String): Boolean {
+    override fun isFolder(pathname: String): Boolean {
         try {
             return Files.isDirectory(File(pathname).toPath(), LinkOption.NOFOLLOW_LINKS)
         } catch (e: Exception) {

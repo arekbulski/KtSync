@@ -46,8 +46,8 @@ abstract class Passthrough(
         return subprocessor.isRegularFile(pathname)
     }
 
-    override fun isDirectory(pathname: String): Boolean {
-        return subprocessor.isDirectory(pathname)
+    override fun isFolder(pathname: String): Boolean {
+        return subprocessor.isFolder(pathname)
     }
 
     override fun isSymbolicLink(pathname: String): Boolean {

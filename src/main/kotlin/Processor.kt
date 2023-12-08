@@ -44,7 +44,7 @@ abstract class Processor {
         throw NotImplementedError()
     }
 
-    open fun isDirectory (pathname: String): Boolean {
+    open fun isFolder (pathname: String): Boolean {
         throw NotImplementedError()
     }
 

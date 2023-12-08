@@ -36,7 +36,7 @@ class FullBackupAlgorithm (
 
         if (! subprocessor.exists(sourcePath))
             throw TotallyFailedException("Source folder $sourcePath does not exist.", this)
-        if (! subprocessor.isDirectory(sourcePath))
+        if (! subprocessor.isFolder(sourcePath))
             throw TotallyFailedException("Source folder $sourcePath is not a folder.", this)
         folder.isFolder = true
         if (subprocessor.exists(destinationPath)) {
@@ -87,7 +87,7 @@ class FullBackupAlgorithm (
                     this.destinationPath = subprocessor.resolve(destinationPath, subprocessor.extractName(entry))
                     this.isRoot = false
                     this.isRegularFile = subprocessor.isRegularFile(entry)
-                    this.isFolder = subprocessor.isDirectory(entry)
+                    this.isFolder = subprocessor.isFolder(entry)
                     if (this.isRegularFile == true)
                         this.size = subprocessor.getSize(entry)
                 }
