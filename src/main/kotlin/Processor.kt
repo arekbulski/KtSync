@@ -1,4 +1,8 @@
+
+// This class is abstract, and it defines a common set of methods that the concrete processor classes implement. Note that the methods are not abstract, they all throw NotImplementedError-s. The subtypes need not override any of them.
 abstract class Processor {
+
+//----------------------------------------------------------------------------------------------------------------------
 
     open fun backupProcess (process: ProcessingProcess) {
         throw NotImplementedError()
@@ -20,6 +24,8 @@ abstract class Processor {
         throw NotImplementedError()
     }
 
+//----------------------------------------------------------------------------------------------------------------------
+
     open fun estimateFolder (process: ProcessingProcess, folder: String) {
         throw NotImplementedError()
     }
@@ -35,6 +41,8 @@ abstract class Processor {
     open fun finishEstimationProgress (process: ProcessingProcess) {
         throw NotImplementedError()
     }
+
+//----------------------------------------------------------------------------------------------------------------------
 
     open fun absolute (pathname: String): String {
         throw NotImplementedError()
@@ -98,11 +106,15 @@ abstract class Processor {
         throw NotImplementedError()
     }
 
-    fun propagate (action: () -> Unit,
-                   onSuccess: (() -> Unit)? = null,
-                   onPartiallyFailed: ((PartiallyFailedException) -> Unit)? = null,
-                   onFailed: ((TotallyFailedException) -> Unit)? = null,
-                   onException: ((Exception) -> Unit)? = null, ) {
+//----------------------------------------------------------------------------------------------------------------------
+
+    fun propagate (
+        action: () -> Unit,
+        onSuccess: (() -> Unit)? = null,
+        onPartiallyFailed: ((PartiallyFailedException) -> Unit)? = null,
+        onFailed: ((TotallyFailedException) -> Unit)? = null,
+        onException: ((Exception) -> Unit)? = null,
+    ) {
         try {
             action.invoke()
             onSuccess?.invoke()
