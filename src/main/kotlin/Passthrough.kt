@@ -14,14 +14,6 @@ abstract class Passthrough(
         subprocessor.backupFile(file)
     }
 
-    override fun finishFolder(folder: ProcessingFile, success: Boolean?, description: String?) {
-        subprocessor.finishFolder(folder, success, description)
-    }
-
-    override fun finishFile(file: ProcessingFile, success: Boolean?, description: String?) {
-        subprocessor.finishFile(file, success, description)
-    }
-
     override fun absolute(pathname: String): String {
         return subprocessor.absolute(pathname)
     }

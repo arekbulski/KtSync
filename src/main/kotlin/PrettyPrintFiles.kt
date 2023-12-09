@@ -6,6 +6,7 @@ import com.github.ajalt.mordant.rendering.TextColors.brightRed
 import com.github.ajalt.mordant.rendering.TextColors.brightWhite
 import com.github.ajalt.mordant.rendering.TextColors.brightMagenta
 
+// This class pretty prints the beginning, progress bar updates, and finalizations of file/folder operations.
 class PrettyPrintFiles (subprocessor: Processor) : Passthrough(subprocessor) {
 
     override fun initFolderProgress(folder: ProcessingFile) {
@@ -19,20 +20,24 @@ class PrettyPrintFiles (subprocessor: Processor) : Passthrough(subprocessor) {
         """.trimIndent()))
     }
 
-    // TODO: Change signature to use exception objects.
-    override fun finishFolderProgress(folder: ProcessingFile, success: Boolean?, description: String?) {
+    override fun finishFolderProgress(folder: ProcessingFile, result: Exception?) {
         val process = folder.process!!
         val profile = process.profile!!
         val terminal = process.terminal!!
 
-        if (success == true) {
-            terminal.println((brightGreen)("   (created)"))
-        }
-        if (success == null) {
-            terminal.println((brightYellow)("   ($description)"))
-        }
-        if (success == false) {
-            terminal.println((brightRed)("   ($description)"))
+        when (result) {
+            null -> {
+                terminal.println((brightGreen)("   (created)"))
+            }
+            is TotalFailureException -> {
+                terminal.println((brightRed)("   ($result)"))
+            }
+            is PartialFailureException -> {
+                terminal.println((brightYellow)("   ($result)"))
+            }
+            else -> {
+                terminal.println((brightRed)("   ($result)"))
+            }
         }
 
         terminal.println((brightMagenta)("progress is ${process.processedCount} ${suffixedSize(process.processedBytes)} out of ${process.estimatedCount} ${suffixedSize(process.estimatedBytes)}"))
@@ -65,12 +70,12 @@ class PrettyPrintFiles (subprocessor: Processor) : Passthrough(subprocessor) {
 
     }
 
-    // TODO: Change signature to use exception objects.
-    override fun finishFileProgress(file: ProcessingFile, success: Boolean?, description: String?) {
+    override fun finishFileProgress(file: ProcessingFile, result: Exception?) {
         val process = file.process!!
         val terminal = process.terminal!!
         val progressbar = process.progressbar!!
 
+        // TODO: Displays fake progress over 1 second.
         repeat(10) {
             Thread.sleep(100)
             progressbar.update()
@@ -79,14 +84,19 @@ class PrettyPrintFiles (subprocessor: Processor) : Passthrough(subprocessor) {
         progressbar.clear()
         process.progressbar = null
 
-        if (success == true) {
-            terminal.println((brightGreen)("   (done)"))
-        }
-        if (success == null) {
-            terminal.println((brightYellow)("   ($description)"))
-        }
-        if (success == false) {
-            terminal.println((brightRed)("   ($description)"))
+        when (result) {
+            null -> {
+                terminal.println((brightGreen)("   (done)"))
+            }
+            is TotalFailureException -> {
+                terminal.println((brightRed)("   ($result)"))
+            }
+            is PartialFailureException -> {
+                terminal.println((brightYellow)("   ($result)"))
+            }
+            else -> {
+                terminal.println((brightRed)("   ($result)"))
+            }
         }
 
         terminal.println((brightMagenta)("progress is ${process.processedCount} ${suffixedSize(process.processedBytes)} out of ${process.estimatedCount} ${suffixedSize(process.estimatedBytes)}"))

@@ -12,15 +12,11 @@ abstract class Processor {
         throw NotImplementedError()
     }
 
-    open fun finishFolder (folder: ProcessingFile, success: Boolean?, description: String?) {
-        throw NotImplementedError()
-    }
-
     open fun initFolderProgress (folder: ProcessingFile) {
         throw NotImplementedError()
     }
 
-    open fun finishFolderProgress (folder: ProcessingFile, success: Boolean?, description: String?) {
+    open fun finishFolderProgress (folder: ProcessingFile, result: Exception?) {
         throw NotImplementedError()
     }
 
@@ -28,15 +24,11 @@ abstract class Processor {
         throw NotImplementedError()
     }
 
-    open fun finishFile (file: ProcessingFile, success: Boolean?, description: String?) {
-        throw NotImplementedError()
-    }
-
     open fun initFileProgress (file: ProcessingFile) {
         throw NotImplementedError()
     }
 
-    open fun finishFileProgress (file: ProcessingFile, success: Boolean?, description: String?) {
+    open fun finishFileProgress(file: ProcessingFile, result: Exception?) {
         throw NotImplementedError()
     }
 

@@ -53,21 +53,21 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
         },{
             if (! folder.isRoot)
               process.processedCount++
-            subprocessor.finishFolderProgress(folder, true, null)
+            subprocessor.finishFolderProgress(folder, null)
         }, {
             if (! folder.isRoot)
                 process.processedCount++
-            subprocessor.finishFolderProgress(folder, null, it.toString())
+            subprocessor.finishFolderProgress(folder, it)
             throw it
         }, {
             if (! folder.isRoot)
                 process.processedCount++
-            subprocessor.finishFolderProgress(folder, false, it.toString())
+            subprocessor.finishFolderProgress(folder, it)
             throw it
         }, {
             if (! folder.isRoot)
                 process.processedCount++
-            subprocessor.finishFolderProgress(folder, false, it.toString())
+            subprocessor.finishFolderProgress(folder, it)
             throw it
         })
 
@@ -139,21 +139,21 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
             process.processedBytes += file.size
             process.successfulCount++
             process.successfulBytes += file.size
-            subprocessor.finishFileProgress(file, true, null)
+            subprocessor.finishFileProgress(file, null)
         }, {
             process.processedCount++
             process.processedBytes += file.size
-            subprocessor.finishFileProgress(file, null, it.description)
+            subprocessor.finishFileProgress(file, it)
             throw it
         }, {
             process.processedCount++
             process.processedBytes += file.size
-            subprocessor.finishFileProgress(file, false, it.description)
+            subprocessor.finishFileProgress(file, it)
             throw it
         }, {
             process.processedCount++
             process.processedBytes += file.size
-            subprocessor.finishFileProgress(file, false, it.toString())
+            subprocessor.finishFileProgress(file, it)
             throw it
         })
     }
