@@ -167,15 +167,12 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
 
         while (queue.isNotEmpty()) {
             val entry = queue.removeAt(0)
+            process.estimatedCount++
             if (subprocessor.isFolder(entry)) {
-                process.estimatedCount++
                 queue.addAll(subprocessor.listFolderEntries(entry))
             } else
             if (subprocessor.isRegularFile(entry)) {
-                process.estimatedCount++
                 process.estimatedBytes += subprocessor.getSize(entry)
-            } else {
-                process.estimatedCount++
             }
             subprocessor.updateEstimationProgress(process)
         }
