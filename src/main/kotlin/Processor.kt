@@ -28,6 +28,10 @@ abstract class Processor {
         throw NotImplementedError()
     }
 
+    open fun updateFileProgress (file: ProcessingFile, progress: Long) {
+        throw NotImplementedError()
+    }
+
     open fun finishFileProgress(file: ProcessingFile, result: Exception?) {
         throw NotImplementedError()
     }
@@ -114,21 +118,19 @@ abstract class Processor {
         throw NotImplementedError()
     }
 
+    open fun copyFileProgressively (sourcePath: String, destinationPath: String, onUpdate: (Long) -> Unit, onSuccess: () -> Unit, onFailure: () -> Unit ) {
+        throw NotImplementedError()
+    }
+
 //----------------------------------------------------------------------------------------------------------------------
 
-    fun propagate (
-        action: () -> Unit,
-        onSuccess: (() -> Unit)? = null,
-        onPartiallyFailed: ((PartialFailureException) -> Unit)? = null,
-        onFailed: ((TotalFailureException) -> Unit)? = null,
-        onException: ((Exception) -> Unit)? = null,
-    ) {
+    fun propagate (action: () -> Unit, onSuccess: (() -> Unit)? = null, onPartiallyFailed: ((PartialFailureException) -> Unit)? = null, onTotallyFailed: ((TotalFailureException) -> Unit)? = null, onException: ((Exception) -> Unit)? = null) {
         try {
             action.invoke()
             onSuccess?.invoke()
         }
         catch (e: TotalFailureException) {
-            onFailed?.invoke(e)
+            onTotallyFailed?.invoke(e)
         }
         catch (e: PartialFailureException) {
             onPartiallyFailed?.invoke(e)

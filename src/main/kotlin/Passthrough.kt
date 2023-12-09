@@ -26,6 +26,10 @@ abstract class Passthrough(
         subprocessor.initFileProgress(file)
     }
 
+    override fun updateFileProgress(file: ProcessingFile, progress: Long) {
+        subprocessor.updateFileProgress(file, progress)
+    }
+
     override fun finishFileProgress(file: ProcessingFile, result: Exception?) {
         subprocessor.finishFileProgress(file, result)
     }
@@ -107,4 +111,9 @@ abstract class Passthrough(
     override fun writeFileContent(pathname: String, data: UByteArray) {
         subprocessor.writeFileContent(pathname, data)
     }
+
+    override fun copyFileProgressively(sourcePath: String, destinationPath: String, onUpdate: (Long) -> Unit, onSuccess: () -> Unit, onFailure: () -> Unit) {
+        subprocessor.copyFileProgressively(sourcePath, destinationPath, onUpdate, onSuccess, onFailure)
+    }
+
 }

@@ -1,3 +1,6 @@
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -131,9 +134,13 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
             if (subprocessor.exists(destinationPath))
                 throw TotalFailureException("Destination file $destinationPath already exists.", this)
 
-            // TODO: Change file read-all/write-all to streaming.
-            val data = subprocessor.readFileContent(sourcePath)
-            subprocessor.writeFileContent(destinationPath, data)
+            val progressBefore = process.processedBytes
+            val progressExpectedAfter = progressBefore + file.size
+            val progressbar = process.progressbar!!
+            subprocessor.copyFileProgressively(sourcePath, destinationPath,
+                { at -> subprocessor.updateFileProgress(file, progressBefore + at) },
+                { subprocessor.updateFileProgress(file, progressExpectedAfter) },
+                { subprocessor.updateFileProgress(file, progressExpectedAfter) })
         },{
             process.processedCount++
             process.processedBytes += file.size

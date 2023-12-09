@@ -70,6 +70,13 @@ class PrettyPrintFiles (subprocessor: Processor) : Passthrough(subprocessor) {
         process.progressbar = progressbar
     }
 
+    override fun updateFileProgress(file: ProcessingFile, progress: Long) {
+        val process = file.process!!
+        val progressbar = process.progressbar!!
+
+        progressbar.update(progress)
+    }
+
     override fun finishFileProgress(file: ProcessingFile, result: Exception?) {
         val process = file.process!!
         val terminal = process.terminal!!
@@ -100,7 +107,7 @@ class PrettyPrintFiles (subprocessor: Processor) : Passthrough(subprocessor) {
         val terminal = process.terminal!!
 
         terminal.println(Markdown("""
-            Estimating a total amount of files and bytes to backup...
+            Indexing source folder for total amount of files and bytes to backup...
         """.trimIndent()))
         val progressbar = terminal.progressAnimation {
             progressBar()

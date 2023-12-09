@@ -1,4 +1,6 @@
 import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
 import java.nio.file.Files
 import java.nio.file.LinkOption
 import java.nio.file.StandardOpenOption
@@ -131,6 +133,34 @@ class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor) {
             Files.write(File(pathname).toPath(), data.asByteArray(), StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE)
         } catch (e: Exception) {
             throw TotalFailureException("Failed to create/write ${data.size} bytes content into file $pathname.", this, e)
+        }
+    }
+
+    override fun copyFileProgressively(sourcePath: String, destinationPath: String, onUpdate: (Long) -> Unit, onSuccess: () -> Unit, onFailure: () -> Unit) {
+        try {
+            if (! this.createRegularFile(destinationPath))
+                throw TotalFailureException("Destination file already exists $destinationPath")
+
+            val buffer = ByteArray(1*1024*1024)
+            var progress = 0L
+
+            FileInputStream(File(sourcePath)).use { inputStream ->
+                FileOutputStream(File(destinationPath)).use { outputStream ->
+                    while (true) {
+                        val amount = inputStream.read(buffer)
+                        if (amount < 0)
+                            break
+                        outputStream.write(buffer, 0, amount)
+
+                        progress += amount
+                        onUpdate.invoke(progress)
+                    }
+                }
+            }
+            onSuccess.invoke()
+        } catch (e: Exception) {
+            onFailure.invoke()
+            throw e
         }
     }
 
