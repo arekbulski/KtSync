@@ -7,14 +7,14 @@ class ExceptionsTest {
 
     @Test
     fun testToString() {
-        val e1 = TotallyFailedException("Description")
-        assert(e1.toString() == "TotallyFailedException (Description)")
-        val e2 = PartiallyFailedException("Description")
-        assert(e2.toString() == "PartiallyFailedException (Description)")
+        val e1 = TotalFailureException("Description")
+        assert(e1.toString() == "TotalFailureException (Description)")
+        val e2 = PartialFailureException("Description")
+        assert(e2.toString() == "PartialFailureException (Description)")
 
         val exception1 = Exception("Message")
-        val nested1 = TotallyFailedException("Description", NothingImplemented(), exception1)
-        assert(nested1.toString() == "TotallyFailedException (Description) (thrown by NothingImplemented) <-- java.lang.Exception: Message")
+        val nested1 = TotalFailureException("Description", NothingImplemented(), exception1)
+        assert(nested1.toString() == "TotalFailureException (Description) (thrown by NothingImplemented) <-- java.lang.Exception: Message")
     }
 
     private fun callForException() {

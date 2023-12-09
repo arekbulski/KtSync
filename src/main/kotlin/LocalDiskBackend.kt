@@ -12,7 +12,7 @@ class LocalDiskBackend (
         try {
             return File(pathname).absolutePath
         } catch (e: Exception) {
-            throw TotallyFailedException("Failed to evaluate absolute path $pathname.", this, e)
+            throw TotalFailureException("Failed to evaluate absolute path $pathname.", this, e)
         }
     }
 
@@ -20,7 +20,7 @@ class LocalDiskBackend (
         try {
             return File(pathname).resolve(relative).absolutePath
         } catch (e: Exception) {
-            throw TotallyFailedException("Failed to evaluate resolved path $pathname with relative $relative.", this, e)
+            throw TotalFailureException("Failed to evaluate resolved path $pathname with relative $relative.", this, e)
         }
     }
 
@@ -28,7 +28,7 @@ class LocalDiskBackend (
         try {
             return "/" + File(pathname).toRelativeString(File(base))
         } catch (e: Exception) {
-            throw TotallyFailedException("Failed to evaluate relative path $pathname with base $base.", this, e)
+            throw TotalFailureException("Failed to evaluate relative path $pathname with base $base.", this, e)
         }
     }
 
@@ -36,7 +36,7 @@ class LocalDiskBackend (
         try {
             return File(pathname).name
         } catch (e: Exception) {
-            throw TotallyFailedException("Failed to extract name from path $pathname.", this, e)
+            throw TotalFailureException("Failed to extract name from path $pathname.", this, e)
         }
     }
 
@@ -44,7 +44,7 @@ class LocalDiskBackend (
         try {
             return Files.exists(File(pathname).toPath(), LinkOption.NOFOLLOW_LINKS)
         } catch (e: Exception) {
-            throw TotallyFailedException("Failed to check if path exists $pathname.", this, e)
+            throw TotalFailureException("Failed to check if path exists $pathname.", this, e)
         }
     }
 
@@ -52,7 +52,7 @@ class LocalDiskBackend (
         try {
             return Files.isRegularFile(File(pathname).toPath(), LinkOption.NOFOLLOW_LINKS)
         } catch (e: Exception) {
-            throw TotallyFailedException("Failed to check if a regular file $pathname.", this, e)
+            throw TotalFailureException("Failed to check if a regular file $pathname.", this, e)
         }
     }
 
@@ -60,7 +60,7 @@ class LocalDiskBackend (
         try {
             return Files.isDirectory(File(pathname).toPath(), LinkOption.NOFOLLOW_LINKS)
         } catch (e: Exception) {
-            throw TotallyFailedException("Failed to check if a directory $pathname.", this, e)
+            throw TotalFailureException("Failed to check if a directory $pathname.", this, e)
         }
     }
 
@@ -68,7 +68,7 @@ class LocalDiskBackend (
         try {
             return Files.isSymbolicLink(File(pathname).toPath())
         } catch (e: Exception) {
-            throw TotallyFailedException("Failed to check if a symbolic link $pathname.", this, e)
+            throw TotalFailureException("Failed to check if a symbolic link $pathname.", this, e)
         }
     }
 
@@ -76,7 +76,7 @@ class LocalDiskBackend (
         try {
             return File(pathname).renameTo(File(newname))
         } catch (e: Exception) {
-            throw TotallyFailedException("Failed to rename $pathname into $newname.", this, e)
+            throw TotalFailureException("Failed to rename $pathname into $newname.", this, e)
         }
     }
 
@@ -84,7 +84,7 @@ class LocalDiskBackend (
         try {
             return File(pathname).mkdir()
         } catch (e: Exception) {
-            throw TotallyFailedException("Failed to create a folder $pathname.", this, e)
+            throw TotalFailureException("Failed to create a folder $pathname.", this, e)
         }
     }
 
@@ -92,18 +92,18 @@ class LocalDiskBackend (
         try {
             return File(pathname).createNewFile()
         } catch (e: Exception) {
-            throw TotallyFailedException("Failed to create a regular file $pathname.", this, e)
+            throw TotalFailureException("Failed to create a regular file $pathname.", this, e)
         }
     }
 
     override fun listFolderEntries(pathname: String): List<String> {
         try {
             return File(pathname).listFiles()?.map{ it.absolutePath }
-                ?: throw TotallyFailedException("Failed to list entries in folder $pathname.", this, null)
-        } catch (e: TotallyFailedException) {
+                ?: throw TotalFailureException("Failed to list entries in folder $pathname.", this, null)
+        } catch (e: TotalFailureException) {
             throw e
         } catch (e: Exception) {
-            throw TotallyFailedException("Failed to list entries in folder $pathname.", this, e)
+            throw TotalFailureException("Failed to list entries in folder $pathname.", this, e)
         }
     }
 
@@ -111,7 +111,7 @@ class LocalDiskBackend (
         try {
             return File(pathname).toPath().fileSize()
         } catch (e: Exception) {
-            throw TotallyFailedException("Failed to get file size of $pathname.", this, e)
+            throw TotalFailureException("Failed to get file size of $pathname.", this, e)
         }
     }
 
@@ -120,7 +120,7 @@ class LocalDiskBackend (
         try {
             return Files.readAllBytes(File(pathname).toPath()).asUByteArray()
         } catch (e: Exception) {
-            throw TotallyFailedException("Failed to read content of file $pathname.", this, e)
+            throw TotalFailureException("Failed to read content of file $pathname.", this, e)
         }
     }
 
@@ -129,7 +129,7 @@ class LocalDiskBackend (
         try {
             Files.write(File(pathname).toPath(), data.asByteArray(), StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE)
         } catch (e: Exception) {
-            throw TotallyFailedException("Failed to create/write ${data.size} bytes content into file $pathname.", this, e)
+            throw TotalFailureException("Failed to create/write ${data.size} bytes content into file $pathname.", this, e)
         }
     }
 

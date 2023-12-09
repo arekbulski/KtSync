@@ -1,5 +1,5 @@
 
-open class PartiallyFailedException(
+open class PartialFailureException(
     open val description: String? = null,
     open val thrownBy: Processor? = null,
     open val causedBy: Exception? = null,

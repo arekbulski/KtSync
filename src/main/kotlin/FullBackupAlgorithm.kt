@@ -14,9 +14,9 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
 
         // TODO: Change semantics. Allow top-level folders to be symbolic links. Just print a warning?
         if (subprocessor.isSymbolicLink(sourcePath))
-            throw TotallyFailedException("Source folder $sourcePath is a symbolic link.")
+            throw TotalFailureException("Source folder $sourcePath is a symbolic link.")
         if (subprocessor.isSymbolicLink(destinationPath))
-            throw TotallyFailedException("Destination folder $destinationPath is a symbolic link.")
+            throw TotalFailureException("Destination folder $destinationPath is a symbolic link.")
 
         val root = ProcessingFile().apply {
             this.process = process
@@ -35,19 +35,19 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
         val destinationPath = folder.destinationPath!!
 
         if (! subprocessor.exists(sourcePath))
-            throw TotallyFailedException("Source folder $sourcePath does not exist.", this)
+            throw TotalFailureException("Source folder $sourcePath does not exist.", this)
         if (! subprocessor.isFolder(sourcePath))
-            throw TotallyFailedException("Source folder $sourcePath is not a folder.", this)
+            throw TotalFailureException("Source folder $sourcePath is not a folder.", this)
         folder.isFolder = true
         if (subprocessor.exists(destinationPath)) {
             if (folder.isRoot) {
                 val datetime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss"))
                 val destinationRenamed = "${destinationPath}-trash-$datetime"
                 if (! subprocessor.renameTo(destinationPath, destinationRenamed))
-                    throw TotallyFailedException("Destination folder $destinationPath could not be renamed.", this)
+                    throw TotalFailureException("Destination folder $destinationPath could not be renamed.", this)
                 process.destinationRenamedTo = subprocessor.extractName(destinationRenamed)
             } else {
-                throw TotallyFailedException("Destination folder $destinationPath already exists.", this)
+                throw TotalFailureException("Destination folder $destinationPath already exists.", this)
             }
         }
 
@@ -55,7 +55,7 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
 
         propagate({
             if (! subprocessor.createFolder(destinationPath))
-                throw TotallyFailedException("Destination folder $destinationPath failed to create.", this)
+                throw TotalFailureException("Destination folder $destinationPath failed to create.", this)
         },{
             if (! folder.isRoot)
               process.processedCount++
@@ -102,14 +102,14 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
                 } else {
                     this.backupFile(subprocessing)
                 }
-            } catch (e: PartiallyFailedException) {
+            } catch (e: PartialFailureException) {
                 failedLocally++
                 process.failedEntries[entry] = e
             }
         }
 
         if (failedLocally > 0)
-            throw PartiallyFailedException("Source folder $sourcePath failed to backup $failedLocally entries.", this)
+            throw PartialFailureException("Source folder $sourcePath failed to backup $failedLocally entries.", this)
 
         if (! folder.isRoot)
             process.successfulCount++
@@ -126,16 +126,16 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
         propagate({
             // Under no scenario can this happen.
             if (file.isRoot)
-                throw TotallyFailedException("A non-directory cannot be top-level backup object.")
+                throw TotalFailureException("A non-directory cannot be top-level backup object.")
             if (! subprocessor.exists(sourcePath))
-                throw TotallyFailedException("Source file $sourcePath does not exist.", this)
+                throw TotalFailureException("Source file $sourcePath does not exist.", this)
             if (subprocessor.isSymbolicLink(sourcePath))
-                throw TotallyFailedException("Source file $sourcePath is a symbolic link.", this)
+                throw TotalFailureException("Source file $sourcePath is a symbolic link.", this)
             if (! subprocessor.isRegularFile(sourcePath))
-                throw TotallyFailedException("Source file $sourcePath is not a regular file.", this)
+                throw TotalFailureException("Source file $sourcePath is not a regular file.", this)
             file.isRegularFile = true
             if (subprocessor.exists(destinationPath))
-                throw TotallyFailedException("Destination file $destinationPath already exists.", this)
+                throw TotalFailureException("Destination file $destinationPath already exists.", this)
 
             val data = subprocessor.readFileContent(sourcePath)
             subprocessor.writeFileContent(destinationPath, data)
