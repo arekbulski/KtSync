@@ -6,9 +6,7 @@ import com.github.ajalt.mordant.rendering.TextColors.brightRed
 import com.github.ajalt.mordant.rendering.TextColors.brightWhite
 import com.github.ajalt.mordant.rendering.TextColors.brightMagenta
 
-class PrettyPrintFiles (
-    subprocessor: Processor
-) : Passthrough(subprocessor) {
+class PrettyPrintFiles (subprocessor: Processor) : Passthrough(subprocessor) {
 
     override fun backupFolder(folder: ProcessingFile) {
         val terminal = folder.process!!.terminal!!
@@ -18,8 +16,6 @@ class PrettyPrintFiles (
         terminal.println(Markdown("""
             * ${(brightWhite)(relativePath)} a folder 
         """.trimIndent()))
-
-        subprocessor.backupFolder(folder)
     }
 
     override fun finishFolder(folder: ProcessingFile, success: Boolean?, description: String?) {

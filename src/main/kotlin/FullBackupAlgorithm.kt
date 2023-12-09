@@ -1,17 +1,12 @@
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-class FullBackupAlgorithm (
-    subprocessor: Processor
-) : Passthrough(subprocessor) {
+class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) {
 
     override fun backupProcess(process: ProcessingProcess) {
         val profile = process.profile!!
         val sourcePath = profile.sourcePath!!
         val destinationPath = profile.destinationPath!!
-
-        // Currently this does nothing.
-        subprocessor.backupProcess(process)
 
         subprocessor.initEstimationProgress(process)
         this.estimateFolder(process, sourcePath)
