@@ -2,9 +2,11 @@ import com.github.ajalt.mordant.animation.ProgressAnimation
 import com.github.ajalt.mordant.terminal.Terminal
 import java.time.LocalDateTime
 
+// This class represents a backup/restore job with all the job configuration details, terminal and progress bar instance, statistics, time measurements, etc.
 class ProcessingProcess {
 
     var profile: Profile? = null
+
     var terminal: Terminal? = null
     var progressbar: ProgressAnimation? = null
 

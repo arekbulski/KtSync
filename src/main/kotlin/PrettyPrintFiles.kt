@@ -42,7 +42,7 @@ class PrettyPrintFiles (subprocessor: Processor) : Passthrough(subprocessor) {
 
         val relativePath = subprocessor.relative(file.sourcePath!!,
             subprocessor.absolute(file.process!!.profile!!.sourcePath!!))
-        if (file.isRegularFile == true) {
+        if (file.isRegularFile) {
             terminal.println(Markdown("""
                 * ${(brightWhite)(relativePath)} (${(brightWhite)(suffixedSize(file.size))}) a regular file 
             """.trimIndent()))

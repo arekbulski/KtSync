@@ -40,14 +40,13 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
             throw TotallyFailedException("Source folder $sourcePath is not a folder.", this)
         folder.isFolder = true
         if (subprocessor.exists(destinationPath)) {
-            if (folder.isRoot!! == true) {
+            if (folder.isRoot) {
                 val datetime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss"))
                 val destinationRenamed = "${destinationPath}-trash-$datetime"
                 if (! subprocessor.renameTo(destinationPath, destinationRenamed))
                     throw TotallyFailedException("Destination folder $destinationPath could not be renamed.", this)
                 process.destinationRenamedTo = subprocessor.extractName(destinationRenamed)
-            }
-            if (folder.isRoot!! == false) {
+            } else {
                 throw TotallyFailedException("Destination folder $destinationPath already exists.", this)
             }
         }
@@ -58,25 +57,25 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
             if (! subprocessor.createFolder(destinationPath))
                 throw TotallyFailedException("Destination folder $destinationPath failed to create.", this)
         },{
-            if (folder.isRoot == false)
+            if (! folder.isRoot)
               process.processedCount++
 
             subprocessor.finishFolder(folder, true, null)
         }, {
-            if (folder.isRoot == false)
+            if (! folder.isRoot)
                 process.processedCount++
 
             // Under no scenario can this happen.
             subprocessor.finishFolder(folder, null, it.toString())
             throw it
         }, {
-            if (folder.isRoot == false)
+            if (! folder.isRoot)
                 process.processedCount++
 
             subprocessor.finishFolder(folder, false, it.toString())
             throw it
         }, {
-            if (folder.isRoot == false)
+            if (! folder.isRoot)
                 process.processedCount++
 
             subprocessor.finishFolder(folder, false, it.toString())
@@ -95,10 +94,10 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
                     this.isRoot = false
                     this.isRegularFile = subprocessor.isRegularFile(entry)
                     this.isFolder = subprocessor.isFolder(entry)
-                    if (this.isRegularFile == true)
+                    if (this.isRegularFile)
                         this.size = subprocessor.getSize(entry)
                 }
-                if (subprocessing.isFolder == true) {
+                if (subprocessing.isFolder) {
                     this.backupFolder(subprocessing)
                 } else {
                     this.backupFile(subprocessing)
@@ -112,7 +111,7 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
         if (failedLocally > 0)
             throw PartiallyFailedException("Source folder $sourcePath failed to backup $failedLocally entries.", this)
 
-        if (folder.isRoot == false)
+        if (! folder.isRoot)
             process.successfulCount++
     }
 
@@ -126,8 +125,8 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
 
         propagate({
             // Under no scenario can this happen.
-            if (file.isRoot == true)
-                throw IllegalStateException("isRoot should be false or null.")
+            if (file.isRoot)
+                throw TotallyFailedException("A non-directory cannot be top-level backup object.")
             if (! subprocessor.exists(sourcePath))
                 throw TotallyFailedException("Source file $sourcePath does not exist.", this)
             if (subprocessor.isSymbolicLink(sourcePath))
