@@ -1,9 +1,9 @@
 import com.github.ajalt.mordant.rendering.TextColors
 import com.github.ajalt.mordant.rendering.TextColors.brightMagenta
 
-class Debug (
-    subprocessor: Processor
-) : Passthrough (subprocessor) {
+// This class is a passthrough class, it prints the arguments/results between the processor above and processor below it. It does not catch any exceptions.
+// TODO: The NothingImplemented processor below it throws exceptions, so this class is now defunct. However it could still be used higher in the processor chain.
+class Debug (subprocessor: Processor) : Passthrough (subprocessor) {
 
     val EnableDebugPrinting = false
 
@@ -13,8 +13,7 @@ class Debug (
             terminal.println((brightMagenta)("(debug) into backupProcess ($process)"))
         subprocessor.backupProcess(process)
         if (EnableDebugPrinting)
-            if (subprocessor !is NothingImplemented)
-                terminal.println((brightMagenta)("(debug) out of backupProcess ($process)"))
+            terminal.println((brightMagenta)("(debug) out of backupProcess ($process)"))
     }
 
     override fun backupFolder(folder: ProcessingFile) {
@@ -23,8 +22,7 @@ class Debug (
             terminal.println((brightMagenta)("(debug) into backupFolder ($folder)"))
         subprocessor.backupFolder(folder)
         if (EnableDebugPrinting)
-            if (subprocessor !is NothingImplemented)
-                terminal.println((brightMagenta)("(debug) out of backupFolder ($folder)"))
+            terminal.println((brightMagenta)("(debug) out of backupFolder ($folder)"))
     }
 
     override fun backupFile(file: ProcessingFile) {
@@ -33,8 +31,7 @@ class Debug (
             terminal.println((brightMagenta)("(debug) into backupFile ($file)"))
         subprocessor.backupFile(file)
         if (EnableDebugPrinting)
-            if (subprocessor !is NothingImplemented)
-                terminal.println((brightMagenta)("(debug) out of backupFile ($file)"))
+            terminal.println((brightMagenta)("(debug) out of backupFile ($file)"))
     }
 
 }
