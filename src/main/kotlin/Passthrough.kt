@@ -22,8 +22,8 @@ abstract class Passthrough(
         return subprocessor.resolve(pathname, relative)
     }
 
-    override fun relative(pathname: String, root: String): String {
-        return subprocessor.relative(pathname, root)
+    override fun relative(pathname: String, base: String): String {
+        return subprocessor.relative(pathname, base)
     }
 
     override fun extractName(pathname: String): String {

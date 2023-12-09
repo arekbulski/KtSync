@@ -4,9 +4,9 @@ import java.nio.file.LinkOption
 import java.nio.file.StandardOpenOption
 import kotlin.io.path.fileSize
 
-class LocalDiskBackend (
-    subprocessor: Processor
-) : Passthrough(subprocessor) {
+// This class exposes filesystem operations is a somewhat agnostic way.
+// TODO: Change some methods to not return values but throw Failure exceptions.
+class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor) {
 
     override fun absolute (pathname: String): String {
         try {
