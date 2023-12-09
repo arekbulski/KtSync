@@ -8,24 +8,26 @@ import com.github.ajalt.mordant.rendering.TextColors.brightMagenta
 
 class PrettyPrintFiles (subprocessor: Processor) : Passthrough(subprocessor) {
 
-    override fun backupFolder(folder: ProcessingFile) {
-        val terminal = folder.process!!.terminal!!
+    override fun initFolderProgress(folder: ProcessingFile) {
+        val process = folder.process!!
+        val profile = process.profile!!
+        val terminal = process.terminal!!
 
-        val relativePath = subprocessor.relative(folder.sourcePath!!,
-            subprocessor.absolute(folder.process!!.profile!!.sourcePath!!))
+        val relativePath = subprocessor.relative(folder.sourcePath!!, subprocessor.absolute(profile.sourcePath!!))
         terminal.println(Markdown("""
             * ${(brightWhite)(relativePath)} a folder 
         """.trimIndent()))
     }
 
-    override fun finishFolder(folder: ProcessingFile, success: Boolean?, description: String?) {
+    // TODO: Change signature to use exception objects.
+    override fun finishFolderProgress(folder: ProcessingFile, success: Boolean?, description: String?) {
         val process = folder.process!!
-        val terminal = folder.process!!.terminal!!
+        val profile = process.profile!!
+        val terminal = process.terminal!!
 
         if (success == true) {
             terminal.println((brightGreen)("   (created)"))
         }
-        // Under no scenario can this happen.
         if (success == null) {
             terminal.println((brightYellow)("   ($description)"))
         }
@@ -33,10 +35,10 @@ class PrettyPrintFiles (subprocessor: Processor) : Passthrough(subprocessor) {
             terminal.println((brightRed)("   ($description)"))
         }
 
-//        terminal.println((brightMagenta)("progress is ${process.processedCount} ${suffixedSize(process.processedBytes)} out of ${process.estimatedCount} ${suffixedSize(process.estimatedBytes)}"))
+        terminal.println((brightMagenta)("progress is ${process.processedCount} ${suffixedSize(process.processedBytes)} out of ${process.estimatedCount} ${suffixedSize(process.estimatedBytes)}"))
     }
 
-    override fun backupFile(file: ProcessingFile) {
+    override fun initFileProgress(file: ProcessingFile) {
         val process = file.process!!
         val terminal = process.terminal!!
 
@@ -60,9 +62,11 @@ class PrettyPrintFiles (subprocessor: Processor) : Passthrough(subprocessor) {
                 * ${(brightWhite)(relativePath)} unknown type
             """.trimIndent()))
         }
+
     }
 
-    override fun finishFile(file: ProcessingFile, success: Boolean?, description: String?) {
+    // TODO: Change signature to use exception objects.
+    override fun finishFileProgress(file: ProcessingFile, success: Boolean?, description: String?) {
         val process = file.process!!
         val terminal = process.terminal!!
         val progressbar = process.progressbar!!
@@ -85,7 +89,7 @@ class PrettyPrintFiles (subprocessor: Processor) : Passthrough(subprocessor) {
             terminal.println((brightRed)("   ($description)"))
         }
 
-//        terminal.println((brightMagenta)("progress is ${process.processedCount} ${suffixedSize(process.processedBytes)} out of ${process.estimatedCount} ${suffixedSize(process.estimatedBytes)}"))
+        terminal.println((brightMagenta)("progress is ${process.processedCount} ${suffixedSize(process.processedBytes)} out of ${process.estimatedCount} ${suffixedSize(process.estimatedBytes)}"))
     }
 
     override fun initEstimationProgress(process: ProcessingProcess) {

@@ -1,6 +1,7 @@
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+// This class handles the meat, meaning it traverses the source folder, establishes file-to-file correspondence, copies everything recursively. It also calls processor below to pretty print progress bars and statuses.
 class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) {
 
     override fun backupProcess(process: ProcessingProcess) {
@@ -8,15 +9,8 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
         val sourcePath = profile.sourcePath!!
         val destinationPath = profile.destinationPath!!
 
-        subprocessor.initEstimationProgress(process)
+        // TODO: Perhaps top-level folder should be included into total count.
         this.estimateFolder(process, sourcePath)
-        subprocessor.finishEstimationProgress(process)
-
-        // TODO: Change semantics. Allow top-level folders to be symbolic links. Just print a warning?
-        if (subprocessor.isSymbolicLink(sourcePath))
-            throw TotalFailureException("Source folder $sourcePath is a symbolic link.")
-        if (subprocessor.isSymbolicLink(destinationPath))
-            throw TotalFailureException("Destination folder $destinationPath is a symbolic link.")
 
         val root = ProcessingFile().apply {
             this.process = process
@@ -24,7 +18,7 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
             this.destinationPath = subprocessor.absolute(destinationPath)
             this.isRoot = true
         }
-
+        // The top-level folder gets copied recursively. Note that isRoot is true.
         this.backupFolder(root)
     }
 
@@ -51,7 +45,7 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
             }
         }
 
-        subprocessor.backupFolder(folder)
+        subprocessor.initFolderProgress(folder)
 
         propagate({
             if (! subprocessor.createFolder(destinationPath))
@@ -59,26 +53,21 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
         },{
             if (! folder.isRoot)
               process.processedCount++
-
-            subprocessor.finishFolder(folder, true, null)
+            subprocessor.finishFolderProgress(folder, true, null)
         }, {
             if (! folder.isRoot)
                 process.processedCount++
-
-            // Under no scenario can this happen.
-            subprocessor.finishFolder(folder, null, it.toString())
+            subprocessor.finishFolderProgress(folder, null, it.toString())
             throw it
         }, {
             if (! folder.isRoot)
                 process.processedCount++
-
-            subprocessor.finishFolder(folder, false, it.toString())
+            subprocessor.finishFolderProgress(folder, false, it.toString())
             throw it
         }, {
             if (! folder.isRoot)
                 process.processedCount++
-
-            subprocessor.finishFolder(folder, false, it.toString())
+            subprocessor.finishFolderProgress(folder, false, it.toString())
             throw it
         })
 
@@ -98,11 +87,15 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
                         this.size = subprocessor.getSize(entry)
                 }
                 if (subprocessing.isFolder) {
+                    // The sub-folders get copied recursively. Note that isRoot is false from now on.
                     this.backupFolder(subprocessing)
                 } else {
+                    // TODO: This method is called for everything but folders (ie. symbolic links).
                     this.backupFile(subprocessing)
                 }
-            } catch (e: PartialFailureException) {
+            }
+            // This catches both TotalFailure and PartialFailure, but not general exceptions.
+            catch (e: PartialFailureException) {
                 failedLocally++
                 process.failedEntries[entry] = e
             }
@@ -121,14 +114,15 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
         val sourcePath = file.sourcePath!!
         val destinationPath = file.destinationPath!!
 
-        subprocessor.backupFile(file)
+        subprocessor.initFileProgress(file)
 
         propagate({
-            // Under no scenario can this happen.
+            // TODO: In the future, regular files will be allowed to be top-level backup objects.
             if (file.isRoot)
-                throw TotalFailureException("A non-directory cannot be top-level backup object.")
+                throw TotalFailureException("A non-directory cannot be a top-level backup object.")
             if (! subprocessor.exists(sourcePath))
                 throw TotalFailureException("Source file $sourcePath does not exist.", this)
+            // TODO: Allow backing up symbolic links.
             if (subprocessor.isSymbolicLink(sourcePath))
                 throw TotalFailureException("Source file $sourcePath is a symbolic link.", this)
             if (! subprocessor.isRegularFile(sourcePath))
@@ -137,6 +131,7 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
             if (subprocessor.exists(destinationPath))
                 throw TotalFailureException("Destination file $destinationPath already exists.", this)
 
+            // TODO: Change file read-all/write-all to streaming.
             val data = subprocessor.readFileContent(sourcePath)
             subprocessor.writeFileContent(destinationPath, data)
         },{
@@ -144,33 +139,31 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
             process.processedBytes += file.size
             process.successfulCount++
             process.successfulBytes += file.size
-
-            subprocessor.finishFile(file, true, null)
+            subprocessor.finishFileProgress(file, true, null)
         }, {
             process.processedCount++
             process.processedBytes += file.size
-
-            subprocessor.finishFile(file, null, it.description)
+            subprocessor.finishFileProgress(file, null, it.description)
             throw it
         }, {
             process.processedCount++
             process.processedBytes += file.size
-
-            subprocessor.finishFile(file, false, it.description)
+            subprocessor.finishFileProgress(file, false, it.description)
             throw it
         }, {
             process.processedCount++
             process.processedBytes += file.size
-
-            subprocessor.finishFile(file, false, it.toString())
+            subprocessor.finishFileProgress(file, false, it.toString())
             throw it
         })
     }
 
+    // This method traverses the source tree (non-recursively) and counts number and size of files and adds those up. It also displays progress while it is doing it.
     override fun estimateFolder(process: ProcessingProcess, folder: String) {
         process.estimatedCount = 0
         process.estimatedBytes = 0
         val queue = arrayListOf(subprocessor.absolute(folder))
+        subprocessor.initEstimationProgress(process)
 
         while (queue.isNotEmpty()) {
             val entry = queue.removeAt(0)
@@ -182,11 +175,11 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
                 process.estimatedCount++
                 process.estimatedBytes += subprocessor.getSize(entry)
             }
-
             subprocessor.updateEstimationProgress(process)
         }
 
         process.estimatedCount--
+        subprocessor.finishEstimationProgress(process)
     }
 
 }

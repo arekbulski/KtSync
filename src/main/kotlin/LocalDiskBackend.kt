@@ -60,12 +60,13 @@ class LocalDiskBackend (
         try {
             return Files.isDirectory(File(pathname).toPath(), LinkOption.NOFOLLOW_LINKS)
         } catch (e: Exception) {
-            throw TotalFailureException("Failed to check if a directory $pathname.", this, e)
+            throw TotalFailureException("Failed to check if a folder $pathname.", this, e)
         }
     }
 
     override fun isSymbolicLink (pathname: String): Boolean {
         try {
+            // TODO: Symlink check should be done with reading attributes with no follow option.
             return Files.isSymbolicLink(File(pathname).toPath())
         } catch (e: Exception) {
             throw TotalFailureException("Failed to check if a symbolic link $pathname.", this, e)
