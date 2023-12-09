@@ -53,22 +53,21 @@ class PrettyPrintFiles (subprocessor: Processor) : Passthrough(subprocessor) {
             terminal.println(Markdown("""
                 * ${(brightWhite)(relativePath)} (${(brightWhite)(suffixedSize(file.size))}) a regular file 
             """.trimIndent()))
-            // TODO: Instantiate only one progress bar, then reuse it over and over again.
-            val progressbar = terminal.progressAnimation {
-                progressBar()
-                completed(includeTotal = true)
-                speed("bytes/sec")
-                timeRemaining()
-            }
-            progressbar.start()
-            progressbar.update(process.processedBytes, process.estimatedBytes)
-            process.progressbar = progressbar
         } else {
             terminal.println(Markdown("""
                 * ${(brightWhite)(relativePath)} unknown type
             """.trimIndent()))
         }
-
+        // TODO: Instantiate only one progress bar, then reuse it over and over again.
+        val progressbar = terminal.progressAnimation {
+            progressBar()
+            completed(includeTotal = true)
+            speed("bytes/sec")
+            timeRemaining()
+        }
+        progressbar.start()
+        progressbar.update(process.processedBytes, process.estimatedBytes)
+        process.progressbar = progressbar
     }
 
     override fun finishFileProgress(file: ProcessingFile, result: Exception?) {
@@ -77,10 +76,10 @@ class PrettyPrintFiles (subprocessor: Processor) : Passthrough(subprocessor) {
         val progressbar = process.progressbar!!
 
         // TODO: Displays fake progress over 1 second.
-        repeat(10) {
-            Thread.sleep(100)
-            progressbar.update()
-        }
+//        repeat(10) {
+//            Thread.sleep(100)
+//            progressbar.update()
+//        }
 
         progressbar.clear()
         process.progressbar = null
@@ -124,10 +123,10 @@ class PrettyPrintFiles (subprocessor: Processor) : Passthrough(subprocessor) {
         progressbar.update(process.estimatedCount)
 
         // TODO: Displays fake progress over 0.25 second.
-        repeat(10) {
-            Thread.sleep(25)
-            progressbar.update()
-        }
+//        repeat(10) {
+//            Thread.sleep(25)
+//            progressbar.update()
+//        }
     }
 
     override fun finishEstimationProgress(process: ProcessingProcess) {

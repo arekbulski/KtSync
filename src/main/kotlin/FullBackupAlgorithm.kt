@@ -170,10 +170,12 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
             if (subprocessor.isFolder(entry)) {
                 process.estimatedCount++
                 queue.addAll(subprocessor.listFolderEntries(entry))
-            }
+            } else
             if (subprocessor.isRegularFile(entry)) {
                 process.estimatedCount++
                 process.estimatedBytes += subprocessor.getSize(entry)
+            } else {
+                process.estimatedCount++
             }
             subprocessor.updateEstimationProgress(process)
         }
