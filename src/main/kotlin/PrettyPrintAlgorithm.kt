@@ -1,4 +1,3 @@
-import com.github.ajalt.mordant.animation.progressAnimation
 import com.github.ajalt.mordant.markdown.Markdown
 import com.github.ajalt.mordant.rendering.TextColors.brightGreen
 import com.github.ajalt.mordant.rendering.TextColors.brightYellow
@@ -7,28 +6,27 @@ import com.github.ajalt.mordant.rendering.TextColors.brightWhite
 import java.time.Duration
 import java.time.LocalDateTime
 
-class PrettyPrintAlgorithm (
-    subprocessor: Processor
-) : Passthrough(subprocessor) {
+// This class establishes pretty printed chapters and results. Note that this class does not handle pretty printing of individual files and folders, or while streaming files. That is the job of PrettyPrintFiles class.
+class PrettyPrintAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) {
 
     override fun backupProcess(process: ProcessingProcess) {
+        val profile = process.profile!!
         val terminal = process.terminal!!
-
-        process.timeBegun = LocalDateTime.now()
 
         terminal.println(Markdown("""
             ## Preface
-            KtSync is starting to backup your files. You chose to backup the folder ${(brightWhite)(process.profile!!.sourcePath!!)} into the folder ${(brightWhite)(process.profile!!.destinationPath!!)} using the ${(brightWhite)("Full Backup algorithm")}. If the destination already exists, it will be safely renamed, do not worry about that.
+            KtSync is starting to backup your files. You chose to backup the folder ${(brightWhite)(profile.sourcePath!!)} into the folder ${(brightWhite)(profile.destinationPath!!)} using the ${(brightWhite)("Full Backup algorithm")}. If the destination already exists, it will be safely renamed, do not worry about that.
             ## Progress
         """.trimIndent()))
 
         propagate({
+            process.processingBegun = LocalDateTime.now()
             subprocessor.backupProcess(process)
         }, {
-            process.timeEnded = LocalDateTime.now()
-            val elapsed = Duration.between(process.timeBegun!!, process.timeEnded!!)
+            process.processingEnded = LocalDateTime.now()
+            val elapsed = Duration.between(process.processingBegun!!, process.processingEnded!!)
             val throughputInBytes = process.successfulBytes / (elapsed.toMillis().toDouble() / 1000.0)
-            val throughputInFiles = (process.successfulCount / (elapsed.toMillis().toDouble() / 1000.0)).toLong()
+            val throughputInFiles = (process.successfulCount / (elapsed.toMillis().toDouble() / 1000.0))
 
             terminal.println(Markdown("""
                 ## Summary
@@ -41,7 +39,7 @@ class PrettyPrintAlgorithm (
                 """.trimIndent()))
             terminal.println(Markdown("""
                 
-                The average throughput was ${(brightWhite)(suffixedThroughput(throughputInBytes))} (or ${(brightWhite)("$throughputInFiles files/sec")}) as sending ${(brightWhite)(suffixedSize(process.successfulBytes))} (or ${(brightWhite)("${process.successfulCount} files")}) took you ${(brightWhite)(timeToHMS(elapsed))} time.
+                The average throughput was ${(brightWhite)(suffixedByteThroughput(throughputInBytes))} (or ${(brightWhite)(suffixedFileThroughput(throughputInFiles))}) as sending ${(brightWhite)(suffixedSize(process.successfulBytes))} (or ${(brightWhite)(suffixedCount(process.successfulCount))}) took you ${(brightWhite)(timeToHMS(elapsed))} time.
             """.trimIndent()))
 
         }, {
@@ -50,6 +48,7 @@ class PrettyPrintAlgorithm (
             """.trimIndent()))
             for ((path, exception) in process.failedEntries) {
                 val relativePath = subprocessor.relative(path, subprocessor.absolute(process.profile!!.sourcePath!!))
+                // TODO: Fix the red/yellow coloring.
                 terminal.println(Markdown("""
                     * ${(brightWhite)(relativePath)} was not backed up due to ${(if (exception is TotallyFailedException) brightRed else brightYellow)(exception.toString())}.
                 """.trimIndent()))
@@ -69,7 +68,7 @@ class PrettyPrintAlgorithm (
             terminal.println(Markdown("""
                 ## Summary
                 ${(brightRed)("Backup has failed. Destination folder is in indeterminate state.")}
-                Reason: $it
+                $it
             """.trimIndent()))
             if (process.destinationRenamedTo != null)
                 terminal.println(Markdown("""
@@ -82,7 +81,7 @@ class PrettyPrintAlgorithm (
             terminal.println(Markdown("""
                 ## Summary
                 ${(brightRed)("Backup has failed. Destination folder is in indeterminate state.")}
-                Reason: $it
+                $it
             """.trimIndent()))
             if (process.destinationRenamedTo != null)
                 terminal.println(Markdown("""

@@ -12,7 +12,11 @@ fun suffixedSize (n: Long): String {
     return "${"%.1f".format(n/1024.0/1024.0/1024.0/1024.0)} TB"
 }
 
-fun suffixedThroughput (s: Double): String {
+fun suffixedCount (n: Long): String {
+    return "$n files"
+}
+
+fun suffixedByteThroughput (s: Double): String {
     if (s < 1024L)
         return "$s bytes/sec"
     if (s < 1024*1024L)
@@ -22,6 +26,10 @@ fun suffixedThroughput (s: Double): String {
     if (s < 1024*1024*1024*1024L)
         return "${"%.1f".format(s/1024.0/1024.0/1024.0)} GB/sec"
     return "${"%.1f".format(s/1024.0/1024.0/1024.0/1024.0)} TB/sec"
+}
+
+fun suffixedFileThroughput (s: Double): String {
+    return "%.1f files/sec".format(s)
 }
 
 fun timeToHMS (d: Duration): String {

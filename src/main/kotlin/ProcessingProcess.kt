@@ -19,7 +19,7 @@ class ProcessingProcess {
     var failedEntries = mutableMapOf<String,Exception>()
 
     var destinationRenamedTo: String? = null
-    var timeBegun: LocalDateTime? = null
-    var timeEnded: LocalDateTime? = null
+    var processingBegun: LocalDateTime? = null
+    var processingEnded: LocalDateTime? = null
 
 }
