@@ -13,9 +13,6 @@ class MainRunner (val subprocessor: Processor) {
                 sourcePath = "temporary/source"
                 destinationPath = "temporary/destination1"
             }
-            // TODO: Move terminal instantiation into PrettyPrintAlgorithm.
-            terminal = Terminal()
-            // TODO: Instantiate only one progress bar, then reuse it over and over again.
         }
 
         try {

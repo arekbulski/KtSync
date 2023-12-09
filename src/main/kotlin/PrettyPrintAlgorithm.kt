@@ -3,6 +3,7 @@ import com.github.ajalt.mordant.rendering.TextColors.brightGreen
 import com.github.ajalt.mordant.rendering.TextColors.brightYellow
 import com.github.ajalt.mordant.rendering.TextColors.brightRed
 import com.github.ajalt.mordant.rendering.TextColors.brightWhite
+import com.github.ajalt.mordant.terminal.Terminal
 import java.time.Duration
 import java.time.LocalDateTime
 
@@ -11,6 +12,8 @@ class PrettyPrintAlgorithm (subprocessor: Processor) : Passthrough(subprocessor)
 
     override fun backupProcess(process: ProcessingProcess) {
         val profile = process.profile!!
+
+        process.terminal = Terminal()
         val terminal = process.terminal!!
 
         terminal.println(Markdown("""

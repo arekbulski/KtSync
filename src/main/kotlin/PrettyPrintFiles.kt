@@ -53,6 +53,7 @@ class PrettyPrintFiles (subprocessor: Processor) : Passthrough(subprocessor) {
             terminal.println(Markdown("""
                 * ${(brightWhite)(relativePath)} (${(brightWhite)(suffixedSize(file.size))}) a regular file 
             """.trimIndent()))
+            // TODO: Instantiate only one progress bar, then reuse it over and over again.
             val progressbar = terminal.progressAnimation {
                 progressBar()
                 completed(includeTotal = true)
