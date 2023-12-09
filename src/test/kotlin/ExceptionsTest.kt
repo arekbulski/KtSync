@@ -13,8 +13,8 @@ class ExceptionsTest {
         assert(e2.toString() == "PartiallyFailedException (Description)")
 
         val exception1 = Exception("Message")
-        val nested1 = TotallyFailedException("Description", DoNothing(), exception1)
-        assert(nested1.toString() == "TotallyFailedException (Description) (thrown by DoNothing) <-- java.lang.Exception: Message")
+        val nested1 = TotallyFailedException("Description", NothingImplemented(), exception1)
+        assert(nested1.toString() == "TotallyFailedException (Description) (thrown by NothingImplemented) <-- java.lang.Exception: Message")
     }
 
     private fun callForException() {

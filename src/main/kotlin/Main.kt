@@ -1,7 +1,7 @@
 
 fun main(args: Array<String>) {
 
-    var subprocessor: Processor = DoNothing()
+    var subprocessor: Processor = NothingImplemented()
     subprocessor = Debug(subprocessor)
     subprocessor = LocalDiskBackend(subprocessor)
     subprocessor = PrettyPrintFiles(subprocessor)

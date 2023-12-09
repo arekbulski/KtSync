@@ -13,7 +13,7 @@ class Debug (
             terminal.println((brightMagenta)("(debug) into backupProcess ($process)"))
         subprocessor.backupProcess(process)
         if (EnableDebugPrinting)
-            if (subprocessor !is DoNothing)
+            if (subprocessor !is NothingImplemented)
                 terminal.println((brightMagenta)("(debug) out of backupProcess ($process)"))
     }
 
@@ -23,7 +23,7 @@ class Debug (
             terminal.println((brightMagenta)("(debug) into backupFolder ($folder)"))
         subprocessor.backupFolder(folder)
         if (EnableDebugPrinting)
-            if (subprocessor !is DoNothing)
+            if (subprocessor !is NothingImplemented)
                 terminal.println((brightMagenta)("(debug) out of backupFolder ($folder)"))
     }
 
@@ -33,7 +33,7 @@ class Debug (
             terminal.println((brightMagenta)("(debug) into backupFile ($file)"))
         subprocessor.backupFile(file)
         if (EnableDebugPrinting)
-            if (subprocessor !is DoNothing)
+            if (subprocessor !is NothingImplemented)
                 terminal.println((brightMagenta)("(debug) out of backupFile ($file)"))
     }
 
