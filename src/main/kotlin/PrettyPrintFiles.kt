@@ -75,9 +75,6 @@ class PrettyPrintFiles (subprocessor: Processor) : Passthrough(subprocessor) {
         val terminal = process.terminal!!
         val progressbar = process.progressbar!!
 
-        // TODO: Displays fake progress over 1 second.
-//        Thread.sleep(1000)
-
         progressbar.clear()
         process.progressbar = null
 
@@ -118,9 +115,6 @@ class PrettyPrintFiles (subprocessor: Processor) : Passthrough(subprocessor) {
         val progressbar = process.progressbar!!
 
         progressbar.update(process.estimatedCount)
-
-        // TODO: Displays fake progress over 1 second.
-//        Thread.sleep(1000)
     }
 
     override fun finishEstimationProgress(process: ProcessingProcess) {
