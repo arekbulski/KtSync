@@ -123,6 +123,7 @@ class PrettyPrintFiles (subprocessor: Processor) : Passthrough(subprocessor) {
 
         progressbar.update(process.estimatedCount)
 
+        // TODO: Displays fake progress over 0.25 second.
         repeat(10) {
             Thread.sleep(25)
             progressbar.update()
