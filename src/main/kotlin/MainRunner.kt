@@ -1,12 +1,11 @@
 import com.github.ajalt.mordant.terminal.Terminal
 import kotlin.system.exitProcess
 
-class MainRunner (
-    val subprocessor: Processor
-) {
+// This class populates a ProcessingProcess/Profile instances with details of what the operation is, creates a terminal, and catches any exceptions and turns them into 0/1 exit status.
+class MainRunner (val subprocessor: Processor) {
 
-    fun main () {
-        // TODO: This configuration needs to be read from a JSON file or from the terminal.
+    fun run () {
+        // TODO: This configuration needs to be read from a JSON file or from the terminal. For now the operation arguments are hardcoded into the code.
         val process = ProcessingProcess().apply {
             profile = Profile().apply {
                 operation = "backup"
@@ -15,12 +14,14 @@ class MainRunner (
                 destinationPath = "temporary/destination1"
             }
             terminal = Terminal()
+            // TODO: Instantiate only one progress bar, then reuse it over and over again.
         }
 
         try {
             subprocessor.backupProcess(process)
             exitProcess(0)
-        } catch (e: Exception) {
+        }
+        catch (e: Exception) {
             exitProcess(1)
         }
     }

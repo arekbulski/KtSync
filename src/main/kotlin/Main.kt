@@ -9,6 +9,6 @@ fun main(args: Array<String>) {
     subprocessor = FullBackupAlgorithm(subprocessor)
     subprocessor = PrettyPrintAlgorithm(subprocessor)
     var runner = MainRunner(subprocessor)
-    runner.main()
+    runner.run()
 
 }
