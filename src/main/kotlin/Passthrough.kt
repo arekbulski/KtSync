@@ -10,8 +10,40 @@ abstract class Passthrough(
         subprocessor.backupFolder(folder)
     }
 
+    override fun initFolderProgress(folder: ProcessingFile) {
+        subprocessor.initFolderProgress(folder)
+    }
+
+    override fun finishFolderProgress(folder: ProcessingFile, result: Exception?) {
+        subprocessor.finishFolderProgress(folder, result)
+    }
+
     override fun backupFile(file: ProcessingFile) {
         subprocessor.backupFile(file)
+    }
+
+    override fun initFileProgress(file: ProcessingFile) {
+        subprocessor.initFileProgress(file)
+    }
+
+    override fun finishFileProgress(file: ProcessingFile, result: Exception?) {
+        subprocessor.finishFileProgress(file, result)
+    }
+
+    override fun estimateFolder(process: ProcessingProcess, folder: String) {
+        subprocessor.estimateFolder(process, folder)
+    }
+
+    override fun initEstimationProgress(process: ProcessingProcess) {
+        subprocessor.initEstimationProgress(process)
+    }
+
+    override fun updateEstimationProgress(process: ProcessingProcess) {
+        subprocessor.updateEstimationProgress(process)
+    }
+
+    override fun finishEstimationProgress(process: ProcessingProcess) {
+        subprocessor.finishEstimationProgress(process)
     }
 
     override fun absolute(pathname: String): String {
