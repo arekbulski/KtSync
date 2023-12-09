@@ -58,12 +58,12 @@ class PrettyPrintFiles (subprocessor: Processor) : Passthrough(subprocessor) {
                 * ${(brightWhite)(relativePath)} unknown type
             """.trimIndent()))
         }
-        // TODO: Instantiate only one progress bar, then reuse it over and over again.
+        // TODO: Enable speed and ETA fields later on.
         val progressbar = terminal.progressAnimation {
             progressBar()
-            completed(includeTotal = true)
-            speed("bytes/sec")
-            timeRemaining()
+            completed(suffix = "B", includeTotal = true)
+//            speed("bytes/sec")
+//            timeRemaining()
         }
         progressbar.start()
         progressbar.update(process.processedBytes, process.estimatedBytes)
