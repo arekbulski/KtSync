@@ -36,10 +36,11 @@ fun suffixedFileThroughput (s: Double): String {
     return "%.1f files/sec".format(s)
 }
 
-// This function transforms a Duration into a string eg. (Duration of 10m 59s) -> "00:10:59".
-fun timeToHMS (d: Duration): String {
+// This function transforms a Duration into a string eg. (Duration of 10m 59s) -> "00:10:59.000".
+fun timeToHMSM (d: Duration): String {
     val hh = d.seconds / 3600
     val mm = (d.seconds % 3600) / 60
     val ss = d.seconds % 60
-    return "%02d:%02d:%02d".format(hh, mm, ss)
+    val milis = d.nano / 1000000
+    return "%02d:%02d:%02d.%03d".format(hh, mm, ss, milis)
 }

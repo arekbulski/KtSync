@@ -42,7 +42,7 @@ class PrettyPrintAlgorithm (subprocessor: Processor) : Passthrough(subprocessor)
                 """.trimIndent()))
             terminal.println(Markdown("""
                 
-                The average throughput was ${(brightWhite)(suffixedByteThroughput(throughputInBytes))} (or ${(brightWhite)(suffixedFileThroughput(throughputInFiles))}) as sending ${(brightWhite)(suffixedSize(process.successfulBytes))} (or ${(brightWhite)(suffixedCount(process.successfulCount))}) took you ${(brightWhite)(timeToHMS(elapsed))} time.
+                The average throughput was ${(brightWhite)(suffixedByteThroughput(throughputInBytes))} (or ${(brightWhite)(suffixedFileThroughput(throughputInFiles))}) as sending ${(brightWhite)(suffixedSize(process.successfulBytes))} (or ${(brightWhite)(suffixedCount(process.successfulCount))}) took you ${(brightWhite)(timeToHMSM(elapsed))} time.
             """.trimIndent()))
 
         }, {
