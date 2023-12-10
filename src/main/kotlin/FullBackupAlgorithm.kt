@@ -99,7 +99,7 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
             throw PartialFailureException("Could not get/set mtime from folder $sourcePath to $destinationPath.", this, it)
         })
 
-        // TODO: Preserve folder permissions.
+        // TODO: Preserve folder mtime and permissions.
 
         if (! folder.isRoot)
             process.successfulCount++
@@ -131,16 +131,6 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
                 { at -> subprocessor.updateFileProgress(file, progressBefore + at) },
                 { subprocessor.updateFileProgress(file, progressExpectedAfter) },
                 { subprocessor.updateFileProgress(file, progressExpectedAfter) })
-
-            propagateCombined({
-                val mtime = subprocessor.getModificationTime(sourcePath)
-                subprocessor.setModificationTime(destinationPath, mtime)
-            }, null, {
-                throw PartialFailureException("Could not get/set mtime from file $sourcePath to $destinationPath.", this, it)
-            })
-
-            // TODO: Preserve file permissions.
-
         },{
             process.processedCount++
             process.processedBytes += file.size
@@ -175,15 +165,6 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
                 throw TotalFailureException("Destination symlink $destinationPath already exists.", this)
 
             subprocessor.copySymbolicLink(sourcePath, destinationPath)
-
-//            propagateCombined({
-//                val mtime = subprocessor.getModificationTime(sourcePath)
-//                subprocessor.setModificationTime(destinationPath, mtime)
-//            }, null, {
-//                throw PartialFailureException("Could not get/set mtime from file $sourcePath to $destinationPath.", this, it)
-//            })
-
-            // TODO: Preserve symlink permissions and mtime.
         },{
             process.processedCount++
             process.successfulCount++

@@ -1,4 +1,3 @@
-import com.github.ajalt.mordant.terminal.Terminal
 import kotlin.system.exitProcess
 
 // This class populates a ProcessingProcess/Profile instances with details of what the operation is, creates a terminal, and catches any exceptions and turns them into 0/1 exit status.

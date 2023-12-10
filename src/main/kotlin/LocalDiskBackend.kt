@@ -166,35 +166,77 @@ class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor) {
     // Note this method creates an empty file atomically, it never overwrites an existing file.
     override fun copyFileProgressively(sourcePath: String, destinationPath: String, onUpdate: (Long) -> Unit, onSuccess: () -> Unit, onFailure: () -> Unit) {
         try {
+            // This method throws a TotalFailureException.
             this.createRegularFile(destinationPath)
 
-            val buffer = ByteArray(1*1024*1024)
-            var progress = 0L
-
-            FileInputStream(File(sourcePath)).use { inputStream ->
-                FileOutputStream(File(destinationPath)).use { outputStream ->
-                    while (true) {
-                        val amount = inputStream.read(buffer)
-                        if (amount < 0)
-                            break
-                        outputStream.write(buffer, 0, amount)
-
-                        progress += amount
-                        onUpdate.invoke(progress)
+            propagateCombined({
+                // TODO: Reuse the buffer across calls.
+                val buffer = ByteArray(1*1024*1024)
+                var progress = 0L
+                FileInputStream(File(sourcePath)).use { inputStream ->
+                    FileOutputStream(File(destinationPath)).use { outputStream ->
+                        while (true) {
+                            val amount = inputStream.read(buffer)
+                            if (amount < 0)
+                                break
+                            outputStream.write(buffer, 0, amount)
+                            progress += amount
+                            onUpdate.invoke(progress)
+                        }
                     }
                 }
-            }
+            }, null, {
+                // TODO: Trash a partially copied file?
+                throw TotalFailureException("Failed to stream copy content from file $sourcePath to file $destinationPath", this, it)
+            })
+
+            propagateCombined({
+                val mtime = Files.getLastModifiedTime(File(sourcePath).toPath(), LinkOption.NOFOLLOW_LINKS)
+                Files.setLastModifiedTime(File(destinationPath).toPath(), mtime)
+            }, null, {
+                throw PartialFailureException("Could not get/set mtime from file $sourcePath to file $destinationPath.", this, it)
+            })
+
+            propagateCombined({
+                val permissions = Files.getPosixFilePermissions(File(sourcePath).toPath(), LinkOption.NOFOLLOW_LINKS)
+                Files.setPosixFilePermissions(File(destinationPath).toPath(), permissions)
+            }, null, {
+                throw PartialFailureException("Could not get/set permissions from file $sourcePath to file $destinationPath.", this, it)
+            })
+
             onSuccess.invoke()
+        // TODO: This may need some rework?
         } catch (e: Exception) {
             onFailure.invoke()
+            // TODO: Maybe throw a new Total or Partial Failure here?
             throw e
         }
     }
 
+    // Note this method creates a symbolic link atomically, it never overwrites an existing file.
     override fun copySymbolicLink(sourcePath: String, destinationPath: String) {
-        val target = Files.readSymbolicLink(File(sourcePath).toPath()).pathString
-        Files.createSymbolicLink(File(destinationPath).toPath(), File(target).toPath())
-        // TODO: Preserve the mtime and other attributes.
+        try {
+            val target = Files.readSymbolicLink(File(sourcePath).toPath()).pathString
+            Files.createSymbolicLink(File(destinationPath).toPath(), File(target).toPath())
+
+            // TODO: Verify this does not touch the target file. Needs fixing.
+//            propagateCombined({
+//                val mtime = Files.getLastModifiedTime(File(sourcePath).toPath(), LinkOption.NOFOLLOW_LINKS)
+//                Files.setLastModifiedTime(File(destinationPath).toPath(), mtime)
+//            }, null, {
+//                throw PartialFailureException("Could not get/set mtime from symlink $sourcePath to symlink $destinationPath.", this, it)
+//            })
+
+            // TODO: Verify this does not touch the target file. Needs fixing.
+//            propagateCombined({
+//                val permissions = Files.getPosixFilePermissions(File(sourcePath).toPath(), LinkOption.NOFOLLOW_LINKS)
+//                Files.setPosixFilePermissions(File(destinationPath).toPath(), permissions)
+//            }, null, {
+//                throw PartialFailureException("Could not get/set permissions from symlink $sourcePath to symlink $destinationPath.", this, it)
+//            })
+        } catch (e: Exception) {
+            throw TotalFailureException("Failed to copy symlink from $sourcePath to symlink $destinationPath", this, e)
+        }
     }
 
 }
