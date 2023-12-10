@@ -69,6 +69,7 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
                     this.destinationPath = subprocessor.resolve(destinationPath, subprocessor.extractName(entry))
                     this.isRoot = false
                     this.isRegularFile = subprocessor.isRegularFile(entry)
+                    this.isSymbolicLink = subprocessor.isSymbolicLink(entry)
                     this.isFolder = subprocessor.isFolder(entry)
                     if (this.isRegularFile)
                         this.size = subprocessor.getSize(entry)
@@ -76,8 +77,9 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
                 if (subprocessing.isFolder) {
                     // The sub-folders get copied recursively. Note that isRoot is false from now on.
                     this.backupFolder(subprocessing)
+                } else if (subprocessing.isSymbolicLink) {
+                    this.backupSymbolicLink(subprocessing)
                 } else {
-                    // TODO: This method is called for everything but folders (ie. symbolic links).
                     this.backupFile(subprocessing)
                 }
             }
@@ -117,9 +119,6 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
                 throw TotalFailureException("A non-directory cannot be a top-level backup object.")
             if (! subprocessor.exists(sourcePath))
                 throw TotalFailureException("Source file $sourcePath does not exist.", this)
-            // TODO: Allow backing up symbolic links.
-            if (subprocessor.isSymbolicLink(sourcePath))
-                throw TotalFailureException("Source file $sourcePath is a symbolic link.", this)
             if (! subprocessor.isRegularFile(sourcePath))
                 throw TotalFailureException("Source file $sourcePath is not a regular file.", this)
             file.isRegularFile = true
@@ -152,6 +151,46 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
             process.processedCount++
             process.processedBytes += file.size
             subprocessor.finishFileProgress(file, it)
+            throw it
+        })
+    }
+
+    override fun backupSymbolicLink(symlink: ProcessingFile) {
+        val process = symlink.process!!
+        val sourcePath = symlink.sourcePath!!
+        val destinationPath = symlink.destinationPath!!
+
+        propagateCombined({
+            subprocessor.initSymbolicLinkProgress(symlink)
+
+            // TODO: In the future, regular files will be allowed to be top-level backup objects.
+            if (symlink.isRoot)
+                throw TotalFailureException("A non-directory cannot be a top-level backup object.")
+            if (! subprocessor.exists(sourcePath))
+                throw TotalFailureException("Source symlink $sourcePath does not exist.", this)
+            if (! subprocessor.isSymbolicLink(sourcePath))
+                throw TotalFailureException("Source symlink $sourcePath is not a symbolic link.", this)
+            symlink.isSymbolicLink = true
+            if (subprocessor.exists(destinationPath))
+                throw TotalFailureException("Destination symlink $destinationPath already exists.", this)
+
+            subprocessor.copySymbolicLink(sourcePath, destinationPath)
+
+//            propagateCombined({
+//                val mtime = subprocessor.getModificationTime(sourcePath)
+//                subprocessor.setModificationTime(destinationPath, mtime)
+//            }, null, {
+//                throw PartialFailureException("Could not get/set mtime from file $sourcePath to $destinationPath.", this, it)
+//            })
+
+            // TODO: Preserve symlink permissions and mtime.
+        },{
+            process.processedCount++
+            process.successfulCount++
+            subprocessor.finishSymbolicLinkProgress(symlink, null)
+        }, {
+            process.processedCount++
+            subprocessor.finishSymbolicLinkProgress(symlink, it)
             throw it
         })
     }

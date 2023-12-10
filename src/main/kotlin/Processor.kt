@@ -37,6 +37,18 @@ abstract class Processor {
         throw NotImplementedError()
     }
 
+    open fun backupSymbolicLink (symlink: ProcessingFile) {
+        throw NotImplementedError()
+    }
+
+    open fun initSymbolicLinkProgress (symlink: ProcessingFile) {
+        throw NotImplementedError()
+    }
+
+    open fun finishSymbolicLinkProgress (symlink: ProcessingFile, result: Exception?) {
+        throw NotImplementedError()
+    }
+
 //----------------------------------------------------------------------------------------------------------------------
 
     open fun estimateFolder (process: ProcessingProcess, folder: String) {
@@ -128,6 +140,10 @@ abstract class Processor {
     }
 
     open fun copyFileProgressively (sourcePath: String, destinationPath: String, onUpdate: (Long) -> Unit, onSuccess: () -> Unit, onFailure: () -> Unit ) {
+        throw NotImplementedError()
+    }
+
+    open fun copySymbolicLink (sourcePath: String, destinationPath: String) {
         throw NotImplementedError()
     }
 

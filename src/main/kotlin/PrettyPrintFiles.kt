@@ -22,7 +22,6 @@ class PrettyPrintFiles (subprocessor: Processor) : Passthrough(subprocessor) {
 
     override fun finishFolderProgress(folder: ProcessingFile, result: Exception?) {
         val process = folder.process!!
-        val profile = process.profile!!
         val terminal = process.terminal!!
 
         when (result) {
@@ -45,10 +44,10 @@ class PrettyPrintFiles (subprocessor: Processor) : Passthrough(subprocessor) {
 
     override fun initFileProgress(file: ProcessingFile) {
         val process = file.process!!
+        val profile = process.profile!!
         val terminal = process.terminal!!
 
-        val relativePath = subprocessor.relative(file.sourcePath!!,
-            subprocessor.absolute(file.process!!.profile!!.sourcePath!!))
+        val relativePath = subprocessor.relative(file.sourcePath!!, subprocessor.absolute(profile.sourcePath!!))
         if (file.isRegularFile) {
             terminal.println(Markdown("""
                 * ${(brightWhite)(relativePath)} (${(brightWhite)(suffixedSize(file.size))}) a regular file 
@@ -81,6 +80,39 @@ class PrettyPrintFiles (subprocessor: Processor) : Passthrough(subprocessor) {
 
         progressbar.clear()
         process.progressbar = null
+
+        when (result) {
+            null -> {
+                terminal.println((brightGreen)("   (done)"))
+            }
+            is TotalFailureException -> {
+                terminal.println((brightRed)("   ($result)"))
+            }
+            is PartialFailureException -> {
+                terminal.println((brightYellow)("   ($result)"))
+            }
+            else -> {
+                terminal.println((brightRed)("   ($result)"))
+            }
+        }
+
+        terminal.println((brightMagenta)("progress is ${process.processedCount} ${suffixedSize(process.processedBytes)} out of ${process.estimatedCount} ${suffixedSize(process.estimatedBytes)}"))
+    }
+
+    override fun initSymbolicLinkProgress(symlink: ProcessingFile) {
+        val process = symlink.process!!
+        val profile = process.profile!!
+        val terminal = process.terminal!!
+
+        val relativePath = subprocessor.relative(symlink.sourcePath!!, subprocessor.absolute(profile.sourcePath!!))
+        terminal.println(Markdown("""
+            * ${(brightWhite)(relativePath)} a symbolic link
+        """.trimIndent()))
+    }
+
+    override fun finishSymbolicLinkProgress(symlink: ProcessingFile, result: Exception?) {
+        val process = symlink.process!!
+        val terminal = process.terminal!!
 
         when (result) {
             null -> {

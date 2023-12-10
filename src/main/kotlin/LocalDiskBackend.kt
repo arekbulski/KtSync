@@ -6,6 +6,7 @@ import java.nio.file.LinkOption
 import java.nio.file.StandardOpenOption
 import java.nio.file.attribute.FileTime
 import kotlin.io.path.fileSize
+import kotlin.io.path.pathString
 
 // This class exposes filesystem operations is a somewhat agnostic way.
 class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor) {
@@ -68,7 +69,6 @@ class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor) {
 
     override fun isSymbolicLink (pathname: String): Boolean {
         try {
-            // TODO: Symlink check should be done with reading attributes with no follow option.
             return Files.isSymbolicLink(File(pathname).toPath())
         } catch (e: Exception) {
             throw TotalFailureException("Failed at checking if a symbolic link $pathname.", this, e)
@@ -189,6 +189,12 @@ class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor) {
             onFailure.invoke()
             throw e
         }
+    }
+
+    override fun copySymbolicLink(sourcePath: String, destinationPath: String) {
+        val target = Files.readSymbolicLink(File(sourcePath).toPath()).pathString
+        Files.createSymbolicLink(File(destinationPath).toPath(), File(target).toPath())
+        // TODO: Preserve the mtime and other attributes.
     }
 
 }

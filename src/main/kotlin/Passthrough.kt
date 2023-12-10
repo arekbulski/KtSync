@@ -36,6 +36,18 @@ abstract class Passthrough(
         subprocessor.finishFileProgress(file, result)
     }
 
+    override fun backupSymbolicLink(symlink: ProcessingFile) {
+        subprocessor.backupSymbolicLink(symlink)
+    }
+
+    override fun initSymbolicLinkProgress(symlink: ProcessingFile) {
+        subprocessor.initSymbolicLinkProgress(symlink)
+    }
+
+    override fun finishSymbolicLinkProgress(symlink: ProcessingFile, result: Exception?) {
+        subprocessor.finishSymbolicLinkProgress(symlink, result)
+    }
+
     override fun estimateFolder(process: ProcessingProcess, folder: String) {
         subprocessor.estimateFolder(process, folder)
     }
@@ -124,6 +136,10 @@ abstract class Passthrough(
 
     override fun copyFileProgressively(sourcePath: String, destinationPath: String, onUpdate: (Long) -> Unit, onSuccess: () -> Unit, onFailure: () -> Unit) {
         subprocessor.copyFileProgressively(sourcePath, destinationPath, onUpdate, onSuccess, onFailure)
+    }
+
+    override fun copySymbolicLink(sourcePath: String, destinationPath: String) {
+        subprocessor.copySymbolicLink(sourcePath, destinationPath)
     }
 
 }
