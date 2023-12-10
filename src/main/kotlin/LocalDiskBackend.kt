@@ -4,6 +4,7 @@ import java.io.FileOutputStream
 import java.nio.file.Files
 import java.nio.file.LinkOption
 import java.nio.file.StandardOpenOption
+import java.nio.file.attribute.FileTime
 import kotlin.io.path.fileSize
 
 // This class exposes filesystem operations is a somewhat agnostic way.
@@ -115,6 +116,22 @@ class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor) {
             return File(pathname).toPath().fileSize()
         } catch (e: Exception) {
             throw TotalFailureException("Failed to get file size of $pathname.", this, e)
+        }
+    }
+
+    override fun getModificationTime(pathname: String): FileTime {
+        try {
+            return Files.getLastModifiedTime(File(pathname).toPath(), LinkOption.NOFOLLOW_LINKS)
+        } catch (e: Exception) {
+            throw TotalFailureException("Failed to get file mtime of $pathname.", this, e)
+        }
+    }
+
+    override fun setModificationTime(pathname: String, mtime: FileTime) {
+        try {
+            Files.setLastModifiedTime(File(pathname).toPath(), mtime)
+        } catch (e: Exception) {
+            throw TotalFailureException("Failed to set file mtime of $pathname.", this, e)
         }
     }
 

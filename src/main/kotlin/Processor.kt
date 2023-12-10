@@ -1,3 +1,4 @@
+import java.nio.file.attribute.FileTime
 
 // This class is abstract, and it defines a common set of methods that the concrete processor classes implement. Note that the methods are not abstract, they all throw NotImplementedError-s. The subtypes need not override any of them.
 abstract class Processor {
@@ -105,6 +106,14 @@ abstract class Processor {
     }
 
     open fun getSize (pathname: String): Long {
+        throw NotImplementedError()
+    }
+
+    open fun getModificationTime (pathname: String): FileTime {
+        throw NotImplementedError()
+    }
+
+    open fun setModificationTime (pathname: String, mtime: FileTime) {
         throw NotImplementedError()
     }
 

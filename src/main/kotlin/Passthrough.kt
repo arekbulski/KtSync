@@ -1,3 +1,5 @@
+import java.nio.file.attribute.FileTime
+
 abstract class Passthrough(
     val subprocessor: Processor,
 ) : Processor() {
@@ -100,6 +102,14 @@ abstract class Passthrough(
 
     override fun getSize(pathname: String): Long {
         return subprocessor.getSize(pathname)
+    }
+
+    override fun getModificationTime(pathname: String): FileTime {
+        return subprocessor.getModificationTime(pathname)
+    }
+
+    override fun setModificationTime(pathname: String, mtime: FileTime) {
+        subprocessor.setModificationTime(pathname, mtime)
     }
 
     @ExperimentalUnsignedTypes

@@ -44,9 +44,9 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
             }
         }
 
-        subprocessor.initFolderProgress(folder)
-
         propagateCombined({
+            subprocessor.initFolderProgress(folder)
+
             if (! subprocessor.createFolder(destinationPath))
                 throw TotalFailureException("Destination folder $destinationPath failed to create.", this)
         },{
@@ -93,6 +93,14 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
         if (failedLocally > 0)
             throw PartialFailureException("Source folder $sourcePath failed to backup $failedLocally entries.", this)
 
+        propagateCombined({
+            val mtime = subprocessor.getModificationTime(sourcePath)
+            subprocessor.setModificationTime(destinationPath, mtime)
+        }, null, {
+            throw PartialFailureException("Could not get/set mtime from folder $sourcePath to $destinationPath.", this, it)
+        })
+
+
         if (! folder.isRoot)
             process.successfulCount++
     }
@@ -126,6 +134,13 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
                 { at -> subprocessor.updateFileProgress(file, progressBefore + at) },
                 { subprocessor.updateFileProgress(file, progressExpectedAfter) },
                 { subprocessor.updateFileProgress(file, progressExpectedAfter) })
+
+            propagateCombined({
+                val mtime = subprocessor.getModificationTime(sourcePath)
+                subprocessor.setModificationTime(destinationPath, mtime)
+            }, null, {
+                throw PartialFailureException("Could not get/set mtime from file $sourcePath to $destinationPath.", this, it)
+            })
         },{
             process.processedCount++
             process.processedBytes += file.size
