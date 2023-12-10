@@ -17,6 +17,7 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
             this.destinationPath = subprocessor.absolute(destinationPath)
             this.isRoot = true
         }
+
         // The top-level folder gets copied recursively. Note that isRoot is true.
         this.backupFolder(root)
     }
@@ -96,10 +97,15 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
             val mtime = subprocessor.getModificationTime(sourcePath)
             subprocessor.setModificationTime(destinationPath, mtime)
         }, null, {
-            throw PartialFailureException("Could not get/set mtime from folder $sourcePath to $destinationPath.", this, it)
+            throw PartialFailureException("Could not get/set mtime from folder $sourcePath to folder $destinationPath.", this, it)
         })
 
-        // TODO: Preserve folder mtime and permissions.
+        propagateCombined({
+            val permissions = subprocessor.getPosixPermissions(sourcePath)
+            subprocessor.setPosixPermissions(destinationPath, permissions)
+        }, null, {
+            throw PartialFailureException("Could not get/set permissions from file $sourcePath to file $destinationPath.", this, it)
+        })
 
         if (! folder.isRoot)
             process.successfulCount++

@@ -5,6 +5,7 @@ import java.nio.file.Files
 import java.nio.file.LinkOption
 import java.nio.file.StandardOpenOption
 import java.nio.file.attribute.FileTime
+import java.nio.file.attribute.PosixFilePermission
 import kotlin.io.path.fileSize
 import kotlin.io.path.pathString
 
@@ -144,6 +145,22 @@ class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor) {
         }
     }
 
+    override fun getPosixPermissions(pathname: String): Set<PosixFilePermission> {
+        try {
+            return Files.getPosixFilePermissions(File(pathname).toPath(), LinkOption.NOFOLLOW_LINKS)
+        } catch (e: Exception) {
+            throw TotalFailureException("Failed to get file mtime of $pathname.", this, e)
+        }
+    }
+
+    override fun setPosixPermissions(pathname: String, permissions: Set<PosixFilePermission>) {
+        try {
+            Files.setPosixFilePermissions(File(pathname).toPath(), permissions)
+        } catch (e: Exception) {
+            throw TotalFailureException("Failed to get file mtime of $pathname.", this, e)
+        }
+    }
+
     @ExperimentalUnsignedTypes
     override fun readFileContent (pathname: String): UByteArray {
         try {
@@ -191,24 +208,22 @@ class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor) {
             })
 
             propagateCombined({
-                val mtime = Files.getLastModifiedTime(File(sourcePath).toPath(), LinkOption.NOFOLLOW_LINKS)
-                Files.setLastModifiedTime(File(destinationPath).toPath(), mtime)
+                val mtime = this.getModificationTime(sourcePath)
+                this.setModificationTime(destinationPath, mtime)
             }, null, {
                 throw PartialFailureException("Could not get/set mtime from file $sourcePath to file $destinationPath.", this, it)
             })
 
             propagateCombined({
-                val permissions = Files.getPosixFilePermissions(File(sourcePath).toPath(), LinkOption.NOFOLLOW_LINKS)
-                Files.setPosixFilePermissions(File(destinationPath).toPath(), permissions)
+                val permissions = this.getPosixPermissions(sourcePath)
+                this.setPosixPermissions(destinationPath, permissions)
             }, null, {
                 throw PartialFailureException("Could not get/set permissions from file $sourcePath to file $destinationPath.", this, it)
             })
 
             onSuccess.invoke()
-        // TODO: This may need some rework?
         } catch (e: Exception) {
             onFailure.invoke()
-            // TODO: Maybe throw a new Total or Partial Failure here?
             throw e
         }
     }

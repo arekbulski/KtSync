@@ -1,4 +1,5 @@
 import java.nio.file.attribute.FileTime
+import java.nio.file.attribute.PosixFilePermission
 
 abstract class Passthrough(
     val subprocessor: Processor,
@@ -122,6 +123,14 @@ abstract class Passthrough(
 
     override fun setModificationTime(pathname: String, mtime: FileTime) {
         subprocessor.setModificationTime(pathname, mtime)
+    }
+
+    override fun getPosixPermissions(pathname: String): Set<PosixFilePermission> {
+        return subprocessor.getPosixPermissions(pathname)
+    }
+
+    override fun setPosixPermissions(pathname: String, permissions: Set<PosixFilePermission>) {
+        subprocessor.setPosixPermissions(pathname, permissions)
     }
 
     @ExperimentalUnsignedTypes
