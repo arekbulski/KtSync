@@ -20,7 +20,7 @@ class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor) {
         }
     }
 
-    override fun resolve(pathname: String, relative: String): String {
+    override fun resolve (pathname: String, relative: String): String {
         try {
             return File(pathname).resolve(relative).absolutePath
         } catch (e: Exception) {
@@ -28,7 +28,7 @@ class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor) {
         }
     }
 
-    override fun relative(pathname: String, base: String): String {
+    override fun relative (pathname: String, base: String): String {
         try {
             return "/" + File(pathname).toRelativeString(File(base))
         } catch (e: Exception) {
@@ -36,7 +36,7 @@ class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor) {
         }
     }
 
-    override fun extractName(pathname: String): String {
+    override fun extractName (pathname: String): String {
         try {
             return File(pathname).name
         } catch (e: Exception) {
@@ -52,7 +52,7 @@ class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor) {
         }
     }
 
-    override fun isRegularFile(pathname: String): Boolean {
+    override fun isRegularFile (pathname: String): Boolean {
         try {
             return Files.isRegularFile(File(pathname).toPath(), LinkOption.NOFOLLOW_LINKS)
         } catch (e: Exception) {
@@ -60,7 +60,7 @@ class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor) {
         }
     }
 
-    override fun isFolder(pathname: String): Boolean {
+    override fun isFolder (pathname: String): Boolean {
         try {
             return Files.isDirectory(File(pathname).toPath(), LinkOption.NOFOLLOW_LINKS)
         } catch (e: Exception) {
@@ -76,7 +76,7 @@ class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor) {
         }
     }
 
-    override fun renameTo(pathname: String, newname: String) {
+    override fun renameTo (pathname: String, newname: String) {
         try {
             if (! File(pathname).renameTo(File(newname)))
                 throw TotalFailureException("Failed to rename $pathname into $newname.", this, null)
@@ -87,7 +87,7 @@ class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor) {
         }
     }
 
-    override fun createFolder(pathname: String) {
+    override fun createFolder (pathname: String) {
         try {
             if(! File(pathname).mkdir())
                 throw TotalFailureException("Failed to create a folder $pathname.", this, null)
@@ -99,7 +99,7 @@ class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor) {
     }
 
     // Note this method creates an empty file atomically, it never overwrites an existing file.
-    override fun createRegularFile(pathname: String) {
+    override fun createRegularFile (pathname: String) {
         try {
             if (! File(pathname).createNewFile())
                 throw TotalFailureException("Failed to create a regular file $pathname.", this, null)
@@ -110,7 +110,7 @@ class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor) {
         }
     }
 
-    override fun listFolderEntries(pathname: String): List<String> {
+    override fun listFolderEntries (pathname: String): List<String> {
         try {
             return File(pathname).listFiles()?.map{ it.absolutePath }
                 ?: throw TotalFailureException("Failed to list entries in folder $pathname.", this, null)
@@ -121,7 +121,7 @@ class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor) {
         }
     }
 
-    override fun getSize(pathname: String): Long {
+    override fun getFileSize (pathname: String): Long {
         try {
             return File(pathname).toPath().fileSize()
         } catch (e: Exception) {
@@ -129,7 +129,7 @@ class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor) {
         }
     }
 
-    override fun getModificationTime(pathname: String): FileTime {
+    override fun getModificationTime (pathname: String): FileTime {
         try {
             return Files.getLastModifiedTime(File(pathname).toPath(), LinkOption.NOFOLLOW_LINKS)
         } catch (e: Exception) {
@@ -137,7 +137,7 @@ class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor) {
         }
     }
 
-    override fun setModificationTime(pathname: String, mtime: FileTime) {
+    override fun setModificationTime (pathname: String, mtime: FileTime) {
         try {
             Files.setLastModifiedTime(File(pathname).toPath(), mtime)
         } catch (e: Exception) {
@@ -145,7 +145,7 @@ class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor) {
         }
     }
 
-    override fun getPosixPermissions(pathname: String): Set<PosixFilePermission> {
+    override fun getPosixPermissions (pathname: String): Set<PosixFilePermission> {
         try {
             return Files.getPosixFilePermissions(File(pathname).toPath(), LinkOption.NOFOLLOW_LINKS)
         } catch (e: Exception) {
@@ -153,7 +153,7 @@ class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor) {
         }
     }
 
-    override fun setPosixPermissions(pathname: String, permissions: Set<PosixFilePermission>) {
+    override fun setPosixPermissions (pathname: String, permissions: Set<PosixFilePermission>) {
         try {
             Files.setPosixFilePermissions(File(pathname).toPath(), permissions)
         } catch (e: Exception) {
@@ -172,7 +172,7 @@ class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor) {
 
     // Note this method creates an empty file atomically, it never overwrites an existing file.
     @ExperimentalUnsignedTypes
-    override fun writeFileContent(pathname: String, data: UByteArray) {
+    override fun writeFileContent (pathname: String, data: UByteArray) {
         try {
             Files.write(File(pathname).toPath(), data.asByteArray(), StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE)
         } catch (e: Exception) {
@@ -181,13 +181,13 @@ class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor) {
     }
 
     // Note this method creates an empty file atomically, it never overwrites an existing file.
-    override fun copyFileProgressively(sourcePath: String, destinationPath: String, onUpdate: (Long) -> Unit, onSuccess: () -> Unit, onFailure: () -> Unit) {
+    override fun copyFileProgressively (sourcePath: String, destinationPath: String, onUpdate: (Long) -> Unit, onSuccess: () -> Unit, onFailure: () -> Unit) {
         try {
             // This method throws a TotalFailureException.
             this.createRegularFile(destinationPath)
 
             propagateCombined({
-                // TODO: Reuse the buffer across calls.
+                // TODO: Reuse the buffer across calls. Or make array smaller, but at maximum 1MiB.
                 val buffer = ByteArray(1*1024*1024)
                 var progress = 0L
                 FileInputStream(File(sourcePath)).use { inputStream ->
@@ -229,7 +229,8 @@ class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor) {
     }
 
     // Note this method creates a symbolic link atomically, it never overwrites an existing file.
-    override fun copySymbolicLink(sourcePath: String, destinationPath: String) {
+    // TODO: mtime and permissions are not preserved.
+    override fun copySymbolicLink (sourcePath: String, destinationPath: String) {
         try {
             val target = Files.readSymbolicLink(File(sourcePath).toPath()).pathString
             Files.createSymbolicLink(File(destinationPath).toPath(), File(target).toPath())
@@ -250,7 +251,7 @@ class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor) {
 //                throw PartialFailureException("Could not get/set permissions from symlink $sourcePath to symlink $destinationPath.", this, it)
 //            })
         } catch (e: Exception) {
-            throw TotalFailureException("Failed to copy symlink from $sourcePath to symlink $destinationPath", this, e)
+            throw TotalFailureException("Failed to copy from symlink $sourcePath to symlink $destinationPath", this, e)
         }
     }
 

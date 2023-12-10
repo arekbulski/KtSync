@@ -118,7 +118,7 @@ abstract class Processor {
         throw NotImplementedError()
     }
 
-    open fun getSize (pathname: String): Long {
+    open fun getFileSize (pathname: String): Long {
         throw NotImplementedError()
     }
 

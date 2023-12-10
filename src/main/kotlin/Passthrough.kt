@@ -113,8 +113,8 @@ abstract class Passthrough(
         return subprocessor.listFolderEntries(pathname)
     }
 
-    override fun getSize(pathname: String): Long {
-        return subprocessor.getSize(pathname)
+    override fun getFileSize(pathname: String): Long {
+        return subprocessor.getFileSize(pathname)
     }
 
     override fun getModificationTime(pathname: String): FileTime {

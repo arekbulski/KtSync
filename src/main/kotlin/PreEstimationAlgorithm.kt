@@ -18,7 +18,7 @@ class PreEstimationAlgorithm (subprocessor: Processor) : Passthrough(subprocesso
                     queue.addAll(subprocessor.listFolderEntries(entry))
                 }
                 if (subprocessor.isRegularFile(entry)) {
-                    process.estimatedBytes += subprocessor.getSize(entry)
+                    process.estimatedBytes += subprocessor.getFileSize(entry)
                 }
                 // Symbolic links are already counted +1 towards estimatedCount.
             }

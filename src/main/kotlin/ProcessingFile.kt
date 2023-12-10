@@ -6,17 +6,17 @@ class ProcessingFile {
 
     var sourcePath: String? = null
     var destinationPath: String? = null
-
     var isRoot: Boolean = false
+
+    var isFolder: Boolean = false
     var isRegularFile: Boolean = false
     var isSymbolicLink: Boolean = false
-    var isFolder: Boolean = false
     var size: Long = 0L
 
     override fun toString(): String {
         return "ProcessingFile: from $sourcePath, to $destinationPath, " +
             "root=$isRoot, regular=$isRegularFile, symlink=$isSymbolicLink, folder=$isFolder, " +
-            "size=$size (~${suffixedFileSize(size)})"
+            "size=$size (${suffixedFileSize(size)})"
     }
 
 }
