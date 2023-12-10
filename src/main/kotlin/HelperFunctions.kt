@@ -1,4 +1,6 @@
 import java.time.Duration
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 // This function transforms number of bytes to a string eg. 5000 -> "5.0 KB".
 fun suffixedFileSize (n: Long): String {
@@ -43,4 +45,10 @@ fun timeToHMSM (d: Duration): String {
     val ss = d.seconds % 60
     val milis = d.nano / 1000000
     return "%02d:%02d:%02d.%03d".format(hh, mm, ss, milis)
+}
+
+// This function generates a current time based pathname eg. ("/file") -> "/file-trash-2023-12-31-12-00-59".
+fun generateTrashPathname (pathname: String): String {
+    val datetime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss"))
+    return "${pathname}-trash-$datetime"
 }

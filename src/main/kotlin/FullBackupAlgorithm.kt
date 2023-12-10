@@ -1,5 +1,3 @@
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 // This class handles the meat, meaning it traverses the source folder, establishes file-to-file correspondence, copies everything recursively. It also calls processor below to pretty print progress bars and statuses.
 class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) {
@@ -35,8 +33,7 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
         folder.isFolder = true
         if (subprocessor.exists(destinationPath)) {
             if (folder.isRoot) {
-                val datetime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss"))
-                val destinationRenamed = "${destinationPath}-trash-$datetime"
+                val destinationRenamed = generateTrashPathname(destinationPath)
                 subprocessor.renameTo(destinationPath, destinationRenamed)
                 process.destinationRenamedTo = subprocessor.extractName(destinationRenamed)
             } else {
