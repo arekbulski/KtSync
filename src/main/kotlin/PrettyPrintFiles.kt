@@ -39,7 +39,7 @@ class PrettyPrintFiles (subprocessor: Processor) : Passthrough(subprocessor) {
             }
         }
 
-        terminal.println((brightMagenta)("progress is ${process.processedCount} ${suffixedSize(process.processedBytes)} out of ${process.estimatedCount} ${suffixedSize(process.estimatedBytes)}"))
+        terminal.println((brightMagenta)("progress is ${process.processedCount} ${suffixedFileSize(process.processedBytes)} out of ${process.estimatedCount} ${suffixedFileSize(process.estimatedBytes)}"))
     }
 
     override fun initFileProgress(file: ProcessingFile) {
@@ -50,7 +50,7 @@ class PrettyPrintFiles (subprocessor: Processor) : Passthrough(subprocessor) {
         val relativePath = subprocessor.relative(file.sourcePath!!, subprocessor.absolute(profile.sourcePath!!))
         if (file.isRegularFile) {
             terminal.println(Markdown("""
-                * ${(brightWhite)(relativePath)} (${(brightWhite)(suffixedSize(file.size))}) a regular file 
+                * ${(brightWhite)(relativePath)} (${(brightWhite)(suffixedFileSize(file.size))}) a regular file 
             """.trimIndent()))
         } else {
             terminal.println(Markdown("""
@@ -96,7 +96,7 @@ class PrettyPrintFiles (subprocessor: Processor) : Passthrough(subprocessor) {
             }
         }
 
-        terminal.println((brightMagenta)("progress is ${process.processedCount} ${suffixedSize(process.processedBytes)} out of ${process.estimatedCount} ${suffixedSize(process.estimatedBytes)}"))
+        terminal.println((brightMagenta)("progress is ${process.processedCount} ${suffixedFileSize(process.processedBytes)} out of ${process.estimatedCount} ${suffixedFileSize(process.estimatedBytes)}"))
     }
 
     override fun initSymbolicLinkProgress(symlink: ProcessingFile) {
@@ -129,7 +129,7 @@ class PrettyPrintFiles (subprocessor: Processor) : Passthrough(subprocessor) {
             }
         }
 
-        terminal.println((brightMagenta)("progress is ${process.processedCount} ${suffixedSize(process.processedBytes)} out of ${process.estimatedCount} ${suffixedSize(process.estimatedBytes)}"))
+        terminal.println((brightMagenta)("progress is ${process.processedCount} ${suffixedFileSize(process.processedBytes)} out of ${process.estimatedCount} ${suffixedFileSize(process.estimatedBytes)}"))
     }
 
     override fun initEstimationProgress(process: ProcessingProcess) {
@@ -159,7 +159,7 @@ class PrettyPrintFiles (subprocessor: Processor) : Passthrough(subprocessor) {
 
         progressbar.clear()
         process.progressbar = null
-        terminal.println("Found ${(brightWhite)("${process.estimatedCount} files")} totaling ${(brightWhite)(suffixedSize(process.estimatedBytes))}.")
+        terminal.println("Found ${(brightWhite)("${process.estimatedCount} files")} totaling ${(brightWhite)(suffixedFileSize(process.estimatedBytes))}.")
         terminal.println()
     }
 

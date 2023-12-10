@@ -16,7 +16,7 @@ class ProcessingFile {
     override fun toString(): String {
         return "ProcessingFile: from $sourcePath, to $destinationPath, " +
             "root=$isRoot, regular=$isRegularFile, symlink=$isSymbolicLink, folder=$isFolder, " +
-            "size=$size (~${suffixedSize(size)})"
+            "size=$size (~${suffixedFileSize(size)})"
     }
 
 }

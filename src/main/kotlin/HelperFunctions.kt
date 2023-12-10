@@ -1,9 +1,9 @@
 import java.time.Duration
 
 // This function transforms number of bytes to a string eg. 5000 -> "5.0 KB".
-fun suffixedSize (n: Long): String {
+fun suffixedFileSize (n: Long): String {
     if (n < 1024L)
-        return "$n bytes"
+        return "$n B"
     if (n < 1024*1024L)
         return "${"%.1f".format(n/1024.0)} KB"
     if (n < 1024*1024*1024L)
@@ -14,14 +14,14 @@ fun suffixedSize (n: Long): String {
 }
 
 // This function transforms a number of files to a string eg. 10 -> "10 files".
-fun suffixedCount (n: Long): String {
+fun suffixedFileCount (n: Long): String {
     return "$n files"
 }
 
 // This function transforms a byte throughput to a string eg. 5000 -> "5.0 KB/sec".
 fun suffixedByteThroughput (s: Double): String {
     if (s < 1024L)
-        return "$s bytes/sec"
+        return "${"%.1f".format(s)} B/sec"
     if (s < 1024*1024L)
         return "${"%.1f".format(s/1024.0)} KB/sec"
     if (s < 1024*1024*1024L)
