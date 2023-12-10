@@ -2,6 +2,7 @@
 // This class handles the meat, meaning it traverses the source folder, establishes file-to-file correspondence, copies everything recursively. It also calls processor below to pretty print progress bars and statuses.
 class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) {
 
+    @ExperimentalUnsignedTypes
     override fun backupProcess(process: ProcessingProcess) {
         val profile = process.profile!!
         val sourcePath = profile.sourcePath!!
@@ -20,7 +21,7 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
         this.backupFolder(root)
     }
 
-    @OptIn(ExperimentalUnsignedTypes::class)
+    @ExperimentalUnsignedTypes
     override fun backupFolder(folder: ProcessingFile) {
         val process = folder.process!!
         val sourcePath = folder.sourcePath!!
