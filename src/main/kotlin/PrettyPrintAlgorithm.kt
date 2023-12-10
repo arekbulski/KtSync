@@ -53,7 +53,7 @@ class PrettyPrintAlgorithm (subprocessor: Processor) : Passthrough(subprocessor)
                 val relativePath = subprocessor.relative(path, subprocessor.absolute(process.profile!!.sourcePath!!))
                 // TODO: Fix the red/yellow coloring.
                 terminal.println(Markdown("""
-                    * ${(brightWhite)(relativePath)} was not backed up due to ${(if (exception is TotalFailureException) brightRed else brightYellow)(exception.toString())}.
+                    * ${(brightWhite)(relativePath)} was not backed up due to ${(if (exception is PartialFailureException && exception !is TotalFailureException) brightYellow else brightRed)(exception.toString())}.
                 """.trimIndent()))
             }
             terminal.println(Markdown("""

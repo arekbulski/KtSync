@@ -27,7 +27,7 @@ class PrettyPrintFiles (subprocessor: Processor) : Passthrough(subprocessor) {
 
         when (result) {
             null -> {
-                terminal.println((brightGreen)("   (created)"))
+                terminal.println((brightGreen)("   (only created)"))
             }
             is TotalFailureException -> {
                 terminal.println((brightRed)("   ($result)"))

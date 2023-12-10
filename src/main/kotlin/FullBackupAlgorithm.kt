@@ -49,7 +49,7 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
             subprocessor.createFolder(destinationPath)
         },{
             if (! folder.isRoot)
-              process.processedCount++
+                process.processedCount++
             subprocessor.finishFolderProgress(folder, null)
         }, {
             if (! folder.isRoot)
@@ -81,8 +81,7 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
                     this.backupFile(subprocessing)
                 }
             }
-            // This catches both TotalFailure and PartialFailure, but not general exceptions.
-            catch (e: PartialFailureException) {
+            catch (e: Exception) {
                 failedLocally++
                 process.failedEntries[entry] = e
             }
@@ -98,6 +97,7 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
             throw PartialFailureException("Could not get/set mtime from folder $sourcePath to $destinationPath.", this, it)
         })
 
+        // TODO: Preserve folder permissions.
 
         if (! folder.isRoot)
             process.successfulCount++
@@ -139,6 +139,9 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
             }, null, {
                 throw PartialFailureException("Could not get/set mtime from file $sourcePath to $destinationPath.", this, it)
             })
+
+            // TODO: Preserve file permissions.
+
         },{
             process.processedCount++
             process.processedBytes += file.size
