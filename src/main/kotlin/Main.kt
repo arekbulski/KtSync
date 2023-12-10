@@ -6,6 +6,7 @@ fun main(args: Array<String>) {
     subprocessor = Debug(subprocessor)
     subprocessor = LocalDiskBackend(subprocessor)
     subprocessor = PrettyPrintFiles(subprocessor)
+    subprocessor = PreEstimationAlgorithm(subprocessor)
     subprocessor = FullBackupAlgorithm(subprocessor)
     subprocessor = PrettyPrintAlgorithm(subprocessor)
     var runner = MainRunner(subprocessor)

@@ -9,8 +9,7 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
         val sourcePath = profile.sourcePath!!
         val destinationPath = profile.destinationPath!!
 
-        // TODO: Perhaps top-level folder should be included into total count.
-        this.estimateFolder(process, sourcePath)
+        subprocessor.estimateFolder(process, sourcePath)
 
         val root = ProcessingFile().apply {
             this.process = process
@@ -139,33 +138,6 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
             subprocessor.finishFileProgress(file, it)
             throw it
         })
-    }
-
-    // This method traverses the source tree (non-recursively) and counts number and size of files and adds those up. It also displays progress while it is doing it.
-    override fun estimateFolder(process: ProcessingProcess, folder: String) {
-        process.estimatedCount = 0
-        process.estimatedBytes = 0
-        val queue = arrayListOf(subprocessor.absolute(folder))
-        subprocessor.initEstimationProgress(process)
-
-        while (queue.isNotEmpty()) {
-            val entry = queue.removeAt(0)
-            process.estimatedCount++
-            try {
-                if (subprocessor.isFolder(entry)) {
-                    queue.addAll(subprocessor.listFolderEntries(entry))
-                } else
-                if (subprocessor.isRegularFile(entry)) {
-                    process.estimatedBytes += subprocessor.getSize(entry)
-                }
-            }
-            catch (e: Exception) {
-            }
-            subprocessor.updateEstimationProgress(process)
-        }
-
-        process.estimatedCount--
-        subprocessor.finishEstimationProgress(process)
     }
 
 }
