@@ -22,7 +22,7 @@ class PrettyPrintAlgorithm (subprocessor: Processor) : Passthrough(subprocessor)
             ## Progress
         """.trimIndent()))
 
-        propagate({
+        propagateArms({
             process.processingBegun = LocalDateTime.now()
             subprocessor.backupProcess(process)
         }, {

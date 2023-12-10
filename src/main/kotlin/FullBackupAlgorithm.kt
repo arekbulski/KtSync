@@ -1,6 +1,3 @@
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -50,23 +47,13 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
 
         subprocessor.initFolderProgress(folder)
 
-        propagate({
+        propagateCombined({
             if (! subprocessor.createFolder(destinationPath))
                 throw TotalFailureException("Destination folder $destinationPath failed to create.", this)
         },{
             if (! folder.isRoot)
               process.processedCount++
             subprocessor.finishFolderProgress(folder, null)
-        }, {
-            if (! folder.isRoot)
-                process.processedCount++
-            subprocessor.finishFolderProgress(folder, it)
-            throw it
-        }, {
-            if (! folder.isRoot)
-                process.processedCount++
-            subprocessor.finishFolderProgress(folder, it)
-            throw it
         }, {
             if (! folder.isRoot)
                 process.processedCount++
@@ -117,9 +104,9 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
         val sourcePath = file.sourcePath!!
         val destinationPath = file.destinationPath!!
 
-        subprocessor.initFileProgress(file)
+        propagateCombined({
+            subprocessor.initFileProgress(file)
 
-        propagate({
             // TODO: In the future, regular files will be allowed to be top-level backup objects.
             if (file.isRoot)
                 throw TotalFailureException("A non-directory cannot be a top-level backup object.")
@@ -136,7 +123,6 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
 
             val progressBefore = process.processedBytes
             val progressExpectedAfter = progressBefore + file.size
-            val progressbar = process.progressbar!!
             subprocessor.copyFileProgressively(sourcePath, destinationPath,
                 { at -> subprocessor.updateFileProgress(file, progressBefore + at) },
                 { subprocessor.updateFileProgress(file, progressExpectedAfter) },
@@ -147,16 +133,6 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
             process.successfulCount++
             process.successfulBytes += file.size
             subprocessor.finishFileProgress(file, null)
-        }, {
-            process.processedCount++
-            process.processedBytes += file.size
-            subprocessor.finishFileProgress(file, it)
-            throw it
-        }, {
-            process.processedCount++
-            process.processedBytes += file.size
-            subprocessor.finishFileProgress(file, it)
-            throw it
         }, {
             process.processedCount++
             process.processedBytes += file.size
