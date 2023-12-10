@@ -1,9 +1,7 @@
 import java.nio.file.attribute.FileTime
 import java.nio.file.attribute.PosixFilePermission
 
-abstract class Passthrough(
-    val subprocessor: Processor,
-) : Processor() {
+abstract class Passthrough(val subprocessor: Processor) : Processor() {
 
     override fun backupProcess(process: ProcessingProcess) {
         subprocessor.backupProcess(process)

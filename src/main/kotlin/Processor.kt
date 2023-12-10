@@ -14,15 +14,21 @@ abstract class Processor {
         throw NotImplementedError()
     }
 
+    open fun backupFile (file: ProcessingFile) {
+        throw NotImplementedError()
+    }
+
+    open fun backupSymbolicLink (symlink: ProcessingFile) {
+        throw NotImplementedError()
+    }
+
+//----------------------------------------------------------------------------------------------------------------------
+
     open fun initFolderProgress (folder: ProcessingFile) {
         throw NotImplementedError()
     }
 
     open fun finishFolderProgress (folder: ProcessingFile, result: Exception?) {
-        throw NotImplementedError()
-    }
-
-    open fun backupFile (file: ProcessingFile) {
         throw NotImplementedError()
     }
 
@@ -35,10 +41,6 @@ abstract class Processor {
     }
 
     open fun finishFileProgress(file: ProcessingFile, result: Exception?) {
-        throw NotImplementedError()
-    }
-
-    open fun backupSymbolicLink (symlink: ProcessingFile) {
         throw NotImplementedError()
     }
 
