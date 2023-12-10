@@ -84,15 +84,15 @@ abstract class Passthrough(
         return subprocessor.isSymbolicLink(pathname)
     }
 
-    override fun renameTo(pathname: String, newname: String): Boolean {
+    override fun renameTo(pathname: String, newname: String) {
         return subprocessor.renameTo(pathname, newname)
     }
 
-    override fun createFolder(pathname: String): Boolean {
+    override fun createFolder(pathname: String) {
         return subprocessor.createFolder(pathname)
     }
 
-    override fun createRegularFile(pathname: String): Boolean {
+    override fun createRegularFile(pathname: String) {
         return subprocessor.createRegularFile(pathname)
     }
 

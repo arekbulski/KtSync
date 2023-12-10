@@ -89,15 +89,15 @@ abstract class Processor {
         throw NotImplementedError()
     }
 
-    open fun renameTo (pathname: String, newname:String): Boolean {
+    open fun renameTo (pathname: String, newname:String) {
         throw NotImplementedError()
     }
 
-    open fun createFolder (pathname: String): Boolean {
+    open fun createFolder (pathname: String) {
         throw NotImplementedError()
     }
 
-    open fun createRegularFile (pathname: String): Boolean {
+    open fun createRegularFile (pathname: String) {
         throw NotImplementedError()
     }
 

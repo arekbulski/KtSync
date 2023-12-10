@@ -36,8 +36,7 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
             if (folder.isRoot) {
                 val datetime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss"))
                 val destinationRenamed = "${destinationPath}-trash-$datetime"
-                if (! subprocessor.renameTo(destinationPath, destinationRenamed))
-                    throw TotalFailureException("Destination folder $destinationPath could not be renamed.", this)
+                subprocessor.renameTo(destinationPath, destinationRenamed)
                 process.destinationRenamedTo = subprocessor.extractName(destinationRenamed)
             } else {
                 throw TotalFailureException("Destination folder $destinationPath already exists.", this)
@@ -47,8 +46,7 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
         propagateCombined({
             subprocessor.initFolderProgress(folder)
 
-            if (! subprocessor.createFolder(destinationPath))
-                throw TotalFailureException("Destination folder $destinationPath failed to create.", this)
+            subprocessor.createFolder(destinationPath)
         },{
             if (! folder.isRoot)
               process.processedCount++

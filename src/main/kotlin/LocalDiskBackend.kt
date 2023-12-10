@@ -8,7 +8,6 @@ import java.nio.file.attribute.FileTime
 import kotlin.io.path.fileSize
 
 // This class exposes filesystem operations is a somewhat agnostic way.
-// TODO: Change some methods to not return values but throw Failure exceptions.
 class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor) {
 
     override fun absolute (pathname: String): String {
@@ -55,7 +54,7 @@ class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor) {
         try {
             return Files.isRegularFile(File(pathname).toPath(), LinkOption.NOFOLLOW_LINKS)
         } catch (e: Exception) {
-            throw TotalFailureException("Failed to check if a regular file $pathname.", this, e)
+            throw TotalFailureException("Failed at checking if a regular file $pathname.", this, e)
         }
     }
 
@@ -63,7 +62,7 @@ class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor) {
         try {
             return Files.isDirectory(File(pathname).toPath(), LinkOption.NOFOLLOW_LINKS)
         } catch (e: Exception) {
-            throw TotalFailureException("Failed to check if a folder $pathname.", this, e)
+            throw TotalFailureException("Failed at checking if a folder $pathname.", this, e)
         }
     }
 
@@ -72,29 +71,39 @@ class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor) {
             // TODO: Symlink check should be done with reading attributes with no follow option.
             return Files.isSymbolicLink(File(pathname).toPath())
         } catch (e: Exception) {
-            throw TotalFailureException("Failed to check if a symbolic link $pathname.", this, e)
+            throw TotalFailureException("Failed at checking if a symbolic link $pathname.", this, e)
         }
     }
 
-    override fun renameTo(pathname: String, newname: String): Boolean {
+    override fun renameTo(pathname: String, newname: String) {
         try {
-            return File(pathname).renameTo(File(newname))
+            if (! File(pathname).renameTo(File(newname)))
+                throw TotalFailureException("Failed to rename $pathname into $newname.", this, null)
+        } catch (e: TotalFailureException) {
+            throw e
         } catch (e: Exception) {
             throw TotalFailureException("Failed to rename $pathname into $newname.", this, e)
         }
     }
 
-    override fun createFolder(pathname: String): Boolean {
+    override fun createFolder(pathname: String) {
         try {
-            return File(pathname).mkdir()
+            if(! File(pathname).mkdir())
+                throw TotalFailureException("Failed to create a folder $pathname.", this, null)
+        } catch (e: TotalFailureException) {
+            throw e
         } catch (e: Exception) {
             throw TotalFailureException("Failed to create a folder $pathname.", this, e)
         }
     }
 
-    override fun createRegularFile(pathname: String): Boolean {
+    // Note this method creates an empty file atomically, it never overwrites an existing file.
+    override fun createRegularFile(pathname: String) {
         try {
-            return File(pathname).createNewFile()
+            if (! File(pathname).createNewFile())
+                throw TotalFailureException("Failed to create a regular file $pathname.", this, null)
+        } catch (e: TotalFailureException) {
+            throw e
         } catch (e: Exception) {
             throw TotalFailureException("Failed to create a regular file $pathname.", this, e)
         }
@@ -144,6 +153,7 @@ class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor) {
         }
     }
 
+    // Note this method creates an empty file atomically, it never overwrites an existing file.
     @ExperimentalUnsignedTypes
     override fun writeFileContent(pathname: String, data: UByteArray) {
         try {
@@ -153,10 +163,10 @@ class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor) {
         }
     }
 
+    // Note this method creates an empty file atomically, it never overwrites an existing file.
     override fun copyFileProgressively(sourcePath: String, destinationPath: String, onUpdate: (Long) -> Unit, onSuccess: () -> Unit, onFailure: () -> Unit) {
         try {
-            if (! this.createRegularFile(destinationPath))
-                throw TotalFailureException("Destination file already exists $destinationPath")
+            this.createRegularFile(destinationPath)
 
             val buffer = ByteArray(1*1024*1024)
             var progress = 0L
