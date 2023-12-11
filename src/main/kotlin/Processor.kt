@@ -154,6 +154,10 @@ abstract class Processor {
         throw NotImplementedError()
     }
 
+    open fun cloneFile (sourcePath: String, destinationPath: String) {
+        throw NotImplementedError()
+    }
+
     open fun copySymbolicLink (sourcePath: String, destinationPath: String) {
         throw NotImplementedError()
     }

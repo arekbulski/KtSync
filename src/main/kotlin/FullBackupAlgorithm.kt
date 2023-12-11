@@ -1,6 +1,6 @@
 
 // This class handles the meat, meaning it traverses the source folder, establishes file-to-file correspondence, copies everything recursively. It also calls processor below to pretty print progress bars and statuses.
-class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) {
+open class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) {
 
     // This method is called once per backup job. It, in manner of speaking, initializes it. This includes indexing the source folder.
     @ExperimentalUnsignedTypes
@@ -16,6 +16,7 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
             this.process = process
             this.sourcePath = subprocessor.absolute(sourcePath)
             this.destinationPath = subprocessor.absolute(destinationPath)
+            this.previousPath = null
             this.isRoot = true
         }
 
@@ -23,7 +24,7 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
         this.backupFolder(root)
     }
 
-    // This method is called once for the root folder plus once for every sub-folder in it. It calls both itself recursively for sub-folders and [backupFile] for sub-files.
+    // This method is called once for the root folder plus once for every sub-folder in it. It calls both itself recursively for sub-folders and [backupFile] non-recursively for sub-files.
     @ExperimentalUnsignedTypes
     override fun backupFolder(folder: ProcessingFile) {
         val process = folder.process!!
@@ -42,6 +43,7 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
             if (folder.isRoot) {
                 val destinationRenamed = generateTrashPathname(destinationPath)
                 subprocessor.renameTo(destinationPath, destinationRenamed)
+                folder.previousPath = destinationRenamed
                 process.destinationRenamedTo = subprocessor.extractName(destinationRenamed)
             } else {
                 throw TotalFailureException("Destination folder $destinationPath already exists.", this)
@@ -68,6 +70,7 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
         // This lists sub-files and sub-folders inside a given source folder. Note that indexing (pre-estimation) that happened earlier has nothing to do with this.
         val entries = subprocessor.listFolderEntries(sourcePath)
         var failedLocally = 0L
+        val previousPathOrNull = folder.previousPath
 
         // Note that any failure, even a TotalFailure or unclassified exception, when copying a sub-file does not stop it's parent from attempting to copy the other entries. However, it does imply a PartialFailure at the end of this method.
         for (entryPathname in entries) {
@@ -76,6 +79,8 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
                     this.process = folder.process
                     this.sourcePath = entryPathname
                     this.destinationPath = subprocessor.resolve(destinationPath, subprocessor.extractName(entryPathname))
+                    if (previousPathOrNull != null)
+                        this.previousPath = subprocessor.resolve(previousPathOrNull, subprocessor.extractName(entryPathname))
                     this.isRoot = false
                     this.isFolder = subprocessor.isFolder(entryPathname)
                     this.isRegularFile = subprocessor.isRegularFile(entryPathname)
@@ -127,11 +132,13 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
     }
 
     // This method copies a single regular file. For symbolic links (that point to regular files) look elsewhere.
+    // TODO: Maybe detect hardlinks in the source branch?
     @ExperimentalUnsignedTypes
     override fun backupFile(file: ProcessingFile) {
         val process = file.process!!
         val sourcePath = file.sourcePath!!
         val destinationPath = file.destinationPath!!
+        val previousPathOrNull = file.previousPath
 
         propagateCombined({
             subprocessor.initFileProgress(file)
@@ -151,13 +158,18 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
             if (subprocessor.exists(destinationPath))
                 throw TotalFailureException("Destination file $destinationPath already exists.", this)
 
-            // File gets stream copied, and the progress bar gets updated after every chunk.
-            val progressBefore = process.processedBytes
-            val progressExpectedAfter = progressBefore + file.size
-            subprocessor.copyFileProgressively(sourcePath, destinationPath,
-                { at -> subprocessor.updateFileProgress(file, progressBefore + at) },
-                { subprocessor.updateFileProgress(file, progressExpectedAfter) },
-                { subprocessor.updateFileProgress(file, progressExpectedAfter) })
+            if (previousPathOrNull != null && this.chooseCloning(file)) {
+                // File gets hardlinked (cloned).
+                subprocessor.cloneFile(previousPathOrNull, destinationPath)
+            } else {
+                // File gets stream copied, and the progress bar gets updated after every chunk.
+                val progressBefore = process.processedBytes
+                val progressExpectedAfter = progressBefore + file.size
+                subprocessor.copyFileProgressively(sourcePath, destinationPath,
+                    { at -> subprocessor.updateFileProgress(file, progressBefore + at) },
+                    { subprocessor.updateFileProgress(file, progressExpectedAfter) },
+                    { subprocessor.updateFileProgress(file, progressExpectedAfter) })
+            }
         },{
             // File was copied successfully. Statistics get updated, and a green status printed.
             process.processedCount++
@@ -172,6 +184,11 @@ class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) 
             subprocessor.finishFileProgress(file, it)
             throw it
         })
+    }
+
+    // This method is to be overridden in [CumulativeBackupAlgorithm] class. Here it does nothing.
+    open fun chooseCloning(file: ProcessingFile): Boolean {
+        return false
     }
 
     // This method copies a symbolic link (just the target pathname).

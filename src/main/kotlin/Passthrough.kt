@@ -11,16 +11,20 @@ abstract class Passthrough(val subprocessor: Processor) : Processor() {
         subprocessor.backupFolder(folder)
     }
 
+    override fun backupFile(file: ProcessingFile) {
+        subprocessor.backupFile(file)
+    }
+
+    override fun backupSymbolicLink(symlink: ProcessingFile) {
+        subprocessor.backupSymbolicLink(symlink)
+    }
+
     override fun initFolderProgress(folder: ProcessingFile) {
         subprocessor.initFolderProgress(folder)
     }
 
     override fun finishFolderProgress(folder: ProcessingFile, result: Exception?) {
         subprocessor.finishFolderProgress(folder, result)
-    }
-
-    override fun backupFile(file: ProcessingFile) {
-        subprocessor.backupFile(file)
     }
 
     override fun initFileProgress(file: ProcessingFile) {
@@ -33,10 +37,6 @@ abstract class Passthrough(val subprocessor: Processor) : Processor() {
 
     override fun finishFileProgress(file: ProcessingFile, result: Exception?) {
         subprocessor.finishFileProgress(file, result)
-    }
-
-    override fun backupSymbolicLink(symlink: ProcessingFile) {
-        subprocessor.backupSymbolicLink(symlink)
     }
 
     override fun initSymbolicLinkProgress(symlink: ProcessingFile) {
@@ -143,6 +143,10 @@ abstract class Passthrough(val subprocessor: Processor) : Processor() {
 
     override fun copyFileProgressively(sourcePath: String, destinationPath: String, onUpdate: (Long) -> Unit, onSuccess: () -> Unit, onFailure: () -> Unit) {
         subprocessor.copyFileProgressively(sourcePath, destinationPath, onUpdate, onSuccess, onFailure)
+    }
+
+    override fun cloneFile(sourcePath: String, destinationPath: String) {
+        subprocessor.cloneFile(sourcePath, destinationPath)
     }
 
     override fun copySymbolicLink(sourcePath: String, destinationPath: String) {

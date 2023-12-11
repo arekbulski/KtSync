@@ -87,6 +87,7 @@ class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor) {
         }
     }
 
+    // Note this method creates an empty folder atomically, it never does anything with an existing folder.
     override fun createFolder (pathname: String) {
         try {
             if(! File(pathname).mkdir())
@@ -181,6 +182,7 @@ class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor) {
     }
 
     // Note this method creates an empty file atomically, it never overwrites an existing file.
+    // Note that [sourcePath] always refers to existing file, and [destinationPath] is always created.
     override fun copyFileProgressively (sourcePath: String, destinationPath: String, onUpdate: (Long) -> Unit, onSuccess: () -> Unit, onFailure: () -> Unit) {
         try {
             // This method throws a TotalFailureException.
@@ -213,7 +215,6 @@ class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor) {
             }, null, {
                 throw PartialFailureException("Could not get/set mtime from file $sourcePath to file $destinationPath.", this, it)
             })
-
             propagateCombined({
                 val permissions = this.getPosixPermissions(sourcePath)
                 this.setPosixPermissions(destinationPath, permissions)
@@ -228,30 +229,39 @@ class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor) {
         }
     }
 
+    // Note this method creates an empty file atomically, it never overwrites an existing file.
+    // Note that [sourcePath] always refers to existing file, and [destinationPath] is always created.
+    override fun cloneFile(sourcePath: String, destinationPath: String) {
+        try {
+            Files.createLink(File(destinationPath).toPath(), File(sourcePath).toPath())
+
+            propagateCombined({
+                val mtime = this.getModificationTime(sourcePath)
+                this.setModificationTime(destinationPath, mtime)
+            }, null, {
+                throw PartialFailureException("Could not get/set mtime from file $sourcePath to file $destinationPath.", this, it)
+            })
+            propagateCombined({
+                val permissions = this.getPosixPermissions(sourcePath)
+                this.setPosixPermissions(destinationPath, permissions)
+            }, null, {
+                throw PartialFailureException("Could not get/set permissions from file $sourcePath to file $destinationPath.", this, it)
+            })
+        } catch (e: PartialFailureException) {
+            throw e
+        } catch (e: Exception) {
+            throw TotalFailureException("Failed to create a hardlink from target $sourcePath to $destinationPath.", this, e)
+        }
+    }
+
     // Note this method creates a symbolic link atomically, it never overwrites an existing file.
-    // TODO: mtime and permissions are not preserved.
+    // Note that [sourcePath] always refers to existing file, and [destinationPath] is always created.
     override fun copySymbolicLink (sourcePath: String, destinationPath: String) {
         try {
             val target = Files.readSymbolicLink(File(sourcePath).toPath()).pathString
             Files.createSymbolicLink(File(destinationPath).toPath(), File(target).toPath())
-
-            // TODO: Verify this does not touch the target file. Needs fixing.
-//            propagateCombined({
-//                val mtime = Files.getLastModifiedTime(File(sourcePath).toPath(), LinkOption.NOFOLLOW_LINKS)
-//                Files.setLastModifiedTime(File(destinationPath).toPath(), mtime)
-//            }, null, {
-//                throw PartialFailureException("Could not get/set mtime from symlink $sourcePath to symlink $destinationPath.", this, it)
-//            })
-
-            // TODO: Verify this does not touch the target file. Needs fixing.
-//            propagateCombined({
-//                val permissions = Files.getPosixFilePermissions(File(sourcePath).toPath(), LinkOption.NOFOLLOW_LINKS)
-//                Files.setPosixFilePermissions(File(destinationPath).toPath(), permissions)
-//            }, null, {
-//                throw PartialFailureException("Could not get/set permissions from symlink $sourcePath to symlink $destinationPath.", this, it)
-//            })
         } catch (e: Exception) {
-            throw TotalFailureException("Failed to copy from symlink $sourcePath to symlink $destinationPath", this, e)
+            throw TotalFailureException("Failed to create symlink from target $sourcePath to $destinationPath", this, e)
         }
     }
 
