@@ -5,10 +5,9 @@ class CumulativeBackupAlgorithm (subprocessor: Processor) : FullBackupAlgorithm(
         val sourcePath = file.sourcePath!!
         val previousPath = file.previousPath!!
 
-        // TODO: Check file permissions as well?
-        return subprocessor.exists(previousPath) &&
-            subprocessor.getFileSize(sourcePath) == subprocessor.getFileSize(previousPath) &&
-            subprocessor.getModificationTime(sourcePath) == subprocessor.getModificationTime(previousPath)
+        return subprocessor.existsRemote(previousPath) &&
+            subprocessor.getFileSizeLocal(sourcePath) == subprocessor.getFileSizeRemote(previousPath) &&
+            subprocessor.getModificationTimeLocal(sourcePath) == subprocessor.getModificationTimeRemote(previousPath)
     }
 
 }

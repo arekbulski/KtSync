@@ -80,7 +80,7 @@ abstract class Processor {
         throw NotImplementedError()
     }
 
-    open fun relative (pathname: String, root: String): String {
+    open fun relative (pathname: String, base: String): String {
         throw NotImplementedError()
     }
 
@@ -88,77 +88,103 @@ abstract class Processor {
         throw NotImplementedError()
     }
 
-    open fun exists (pathname: String): Boolean {
+//----------------------------------------------------------------------------------------------------------------------
+
+    open fun existsLocal (pathname: String): Boolean {
         throw NotImplementedError()
     }
 
-    open fun isRegularFile (pathname: String): Boolean {
+    open fun isRegularFileLocal (pathname: String): Boolean {
         throw NotImplementedError()
     }
 
-    open fun isFolder (pathname: String): Boolean {
+    open fun isFolderLocal (pathname: String): Boolean {
         throw NotImplementedError()
     }
 
-    open fun isSymbolicLink (pathname: String): Boolean {
+    open fun isSymbolicLinkLocal (pathname: String): Boolean {
         throw NotImplementedError()
     }
 
-    open fun renameTo (pathname: String, newname:String) {
+    open fun listFolderEntriesLocal (pathname: String): List<String> {
         throw NotImplementedError()
     }
 
-    open fun createFolder (pathname: String) {
+    open fun getFileSizeLocal (pathname: String): Long {
         throw NotImplementedError()
     }
 
-    open fun createRegularFile (pathname: String) {
+    open fun getModificationTimeLocal (pathname: String): FileTime {
         throw NotImplementedError()
     }
 
-    open fun listFolderEntries (pathname: String): List<String> {
-        throw NotImplementedError()
-    }
-
-    open fun getFileSize (pathname: String): Long {
-        throw NotImplementedError()
-    }
-
-    open fun getModificationTime (pathname: String): FileTime {
-        throw NotImplementedError()
-    }
-
-    open fun setModificationTime (pathname: String, mtime: FileTime) {
-        throw NotImplementedError()
-    }
-
-    open fun getPosixPermissions (pathname: String): Set<PosixFilePermission> {
-        throw NotImplementedError()
-    }
-
-    open fun setPosixPermissions (pathname: String, permissions: Set<PosixFilePermission>) {
+    open fun getPosixPermissionsLocal (pathname: String): Set<PosixFilePermission> {
         throw NotImplementedError()
     }
 
     @ExperimentalUnsignedTypes
+    @Deprecated("Implemented but UNUSED and NOT RENAMED")
     open fun readFileContent (pathname: String): UByteArray {
         throw NotImplementedError()
     }
 
     @ExperimentalUnsignedTypes
+    @Deprecated("Implemented but UNUSED and NOT RENAMED")
     open fun writeFileContent (pathname: String, data: UByteArray) {
         throw NotImplementedError()
     }
 
-    open fun copyFileProgressively (sourcePath: String, destinationPath: String, onUpdate: (Long) -> Unit, onSuccess: () -> Unit, onFailure: () -> Unit ) {
+//----------------------------------------------------------------------------------------------------------------------
+
+    open fun encodeNameRemote (name: String): String {
         throw NotImplementedError()
     }
 
-    open fun cloneFile (sourcePath: String, destinationPath: String) {
+    open fun existsRemote (pathname: String): Boolean {
         throw NotImplementedError()
     }
 
-    open fun copySymbolicLink (sourcePath: String, destinationPath: String) {
+    open fun renameToRemote (pathname: String, newname:String) {
+        throw NotImplementedError()
+    }
+
+    open fun createFolderRemote (pathname: String) {
+        throw NotImplementedError()
+    }
+
+    open fun createRegularFileRemote (pathname: String) {
+        throw NotImplementedError()
+    }
+
+    open fun getFileSizeRemote (pathname: String): Long {
+        throw NotImplementedError()
+    }
+
+    open fun getModificationTimeRemote (pathname: String): FileTime {
+        throw NotImplementedError()
+    }
+
+    open fun setModificationTimeRemote (pathname: String, mtime: FileTime) {
+        throw NotImplementedError()
+    }
+
+    open fun getPosixPermissionsRemote (pathname: String): Set<PosixFilePermission> {
+        throw NotImplementedError()
+    }
+
+    open fun setPosixPermissionsRemote (pathname: String, permissions: Set<PosixFilePermission>) {
+        throw NotImplementedError()
+    }
+
+    open fun copyFileProgressivelyRemote (sourcePath: String, destinationPath: String, onUpdate: (Long) -> Unit, onSuccess: () -> Unit, onFailure: () -> Unit ) {
+        throw NotImplementedError()
+    }
+
+    open fun cloneFileRemote (sourcePath: String, destinationPath: String) {
+        throw NotImplementedError()
+    }
+
+    open fun copySymbolicLinkRemote (sourcePath: String, destinationPath: String) {
         throw NotImplementedError()
     }
 
@@ -189,5 +215,7 @@ abstract class Processor {
             onException?.invoke(e)
         }
     }
+
+//----------------------------------------------------------------------------------------------------------------------
 
 }

@@ -14,11 +14,11 @@ class PreEstimationAlgorithm (subprocessor: Processor) : Passthrough(subprocesso
             val entry = queue.removeAt(0)
             process.estimatedCount++
             try {
-                if (subprocessor.isFolder(entry)) {
-                    queue.addAll(subprocessor.listFolderEntries(entry))
+                if (subprocessor.isFolderLocal(entry)) {
+                    queue.addAll(subprocessor.listFolderEntriesLocal(entry))
                 }
-                if (subprocessor.isRegularFile(entry)) {
-                    process.estimatedBytes += subprocessor.getFileSize(entry)
+                if (subprocessor.isRegularFileLocal(entry)) {
+                    process.estimatedBytes += subprocessor.getFileSizeLocal(entry)
                 }
                 // Symbolic links are already counted +1 towards estimatedCount.
             }

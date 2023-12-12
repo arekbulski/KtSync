@@ -32,17 +32,17 @@ open class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subproces
         val destinationPath = folder.destinationPath!!
 
         // Source folder checks (not just root): At the end of it, a source folder must exist and well, be a folder and not a symbolic link to a folder or anything else.
-        if (! subprocessor.exists(sourcePath))
+        if (! subprocessor.existsLocal(sourcePath))
             throw TotalFailureException("Source folder $sourcePath does not exist.", this)
-        if (! subprocessor.isFolder(sourcePath))
+        if (! subprocessor.isFolderLocal(sourcePath))
             throw TotalFailureException("Source folder $sourcePath is not a folder.", this)
         folder.isFolder = true
 
         // Destination folder checks (not just root): At the end of it, the destination folder must not exist, although in case of the root folder a rename is performed.
-        if (subprocessor.exists(destinationPath)) {
+        if (subprocessor.existsRemote(destinationPath)) {
             if (folder.isRoot) {
                 val destinationRenamed = generateTrashPathname(destinationPath)
-                subprocessor.renameTo(destinationPath, destinationRenamed)
+                subprocessor.renameToRemote(destinationPath, destinationRenamed)
                 folder.previousPath = destinationRenamed
                 process.destinationRenamedTo = subprocessor.extractName(destinationRenamed)
             } else {
@@ -53,7 +53,7 @@ open class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subproces
         // This only creates an empty folder. The green status in the terminal below the item only means "folder created", as sub-folders were not created yet, sub-files were not copied yet, nor were mtime or permissions assigned yet. Note that failure to create a folder does constitute a TotalFailure, while any issues afterwards only constitute a PartialFailure.
         propagateCombined({
             subprocessor.initFolderProgress(folder)
-            subprocessor.createFolder(destinationPath)
+            subprocessor.createFolderRemote(destinationPath)
         },{
             // Root folder does not count towards processed entries.
             if (! folder.isRoot)
@@ -68,7 +68,7 @@ open class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subproces
         })
 
         // This lists sub-files and sub-folders inside a given source folder. Note that indexing (pre-estimation) that happened earlier has nothing to do with this.
-        val entries = subprocessor.listFolderEntries(sourcePath)
+        val entries = subprocessor.listFolderEntriesLocal(sourcePath)
         var failedLocally = 0L
         val previousPathOrNull = folder.previousPath
 
@@ -82,24 +82,28 @@ open class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subproces
                     if (previousPathOrNull != null)
                         this.previousPath = subprocessor.resolve(previousPathOrNull, subprocessor.extractName(entryPathname))
                     this.isRoot = false
-                    this.isFolder = subprocessor.isFolder(entryPathname)
-                    this.isRegularFile = subprocessor.isRegularFile(entryPathname)
-                    this.isSymbolicLink = subprocessor.isSymbolicLink(entryPathname)
+                    this.isFolder = subprocessor.isFolderLocal(entryPathname)
+                    this.isRegularFile = subprocessor.isRegularFileLocal(entryPathname)
+                    this.isSymbolicLink = subprocessor.isSymbolicLinkLocal(entryPathname)
                     if (this.isRegularFile)
-                        this.size = subprocessor.getFileSize(entryPathname)
+                        this.size = subprocessor.getFileSizeLocal(entryPathname)
                 }
                 if (entry.isFolder) {
                     // The sub-folders get copied recursively. Note that isRoot is false from now on.
                     this.backupFolder(entry)
+                    continue
                 }
                 if (entry.isRegularFile) {
                     this.backupFile(entry)
+                    continue
                 }
                 if (entry.isSymbolicLink) {
                     this.backupSymbolicLink(entry)
+                    continue
                 }
+                throw TotalFailureException("Unknown entry type $entryPathname")
             }
-            // If an entry does not get copied correctly, it is listed in the [failedEntries] map. That (insertion sorted) map gets reported in Issues chapter after the backup job finished. Note that this catch clause is not limited to Partial/Total Failure.
+            // If an entry does not get copied correctly, it is listed in the [failedEntries] map. That (insertion ordered) map gets reported in Issues chapter after the backup job finished. Note that this catch clause is not limited to Partial/Total Failure.
             catch (e: Exception) {
                 failedLocally++
                 process.failedEntries[entryPathname] = e
@@ -112,16 +116,16 @@ open class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subproces
 
         // Failure to preserve mtime or permissions also constitutes a PartialFailure.
         propagateCombined({
-            val mtime = subprocessor.getModificationTime(sourcePath)
-            subprocessor.setModificationTime(destinationPath, mtime)
+            val mtime = subprocessor.getModificationTimeLocal(sourcePath)
+            subprocessor.setModificationTimeRemote(destinationPath, mtime)
         }, null, {
             throw PartialFailureException("Could not get/set mtime from folder $sourcePath to folder $destinationPath.", this, it)
         })
 
         // Failure to preserve mtime or permissions also constitutes a PartialFailure.
         propagateCombined({
-            val permissions = subprocessor.getPosixPermissions(sourcePath)
-            subprocessor.setPosixPermissions(destinationPath, permissions)
+            val permissions = subprocessor.getPosixPermissionsLocal(sourcePath)
+            subprocessor.setPosixPermissionsRemote(destinationPath, permissions)
         }, null, {
             throw PartialFailureException("Could not get/set permissions from file $sourcePath to file $destinationPath.", this, it)
         })
@@ -148,24 +152,24 @@ open class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subproces
                 throw TotalFailureException("A non-directory cannot be a top-level backup object.")
 
             // Source file checks: At the end of it, a source file must exist and it gets confirmed that it is a regular file and not something else.
-            if (! subprocessor.exists(sourcePath))
+            if (! subprocessor.existsLocal(sourcePath))
                 throw TotalFailureException("Source file $sourcePath does not exist.", this)
-            if (! subprocessor.isRegularFile(sourcePath))
+            if (! subprocessor.isRegularFileLocal(sourcePath))
                 throw TotalFailureException("Source file $sourcePath is not a regular file.", this)
             file.isRegularFile = true
 
             // Destination file checks: At the end of it, the destination file must not exist before the copying starts. This is to ensure that something important does not get overwritten by accident.
-            if (subprocessor.exists(destinationPath))
+            if (subprocessor.existsRemote(destinationPath))
                 throw TotalFailureException("Destination file $destinationPath already exists.", this)
 
             if (previousPathOrNull != null && this.chooseCloning(file)) {
                 // File gets hardlinked (cloned).
-                subprocessor.cloneFile(previousPathOrNull, destinationPath)
+                subprocessor.cloneFileRemote(previousPathOrNull, destinationPath)
             } else {
                 // File gets stream copied, and the progress bar gets updated after every chunk.
                 val progressBefore = process.processedBytes
                 val progressExpectedAfter = progressBefore + file.size
-                subprocessor.copyFileProgressively(sourcePath, destinationPath,
+                subprocessor.copyFileProgressivelyRemote(sourcePath, destinationPath,
                     { at -> subprocessor.updateFileProgress(file, progressBefore + at) },
                     { subprocessor.updateFileProgress(file, progressExpectedAfter) },
                     { subprocessor.updateFileProgress(file, progressExpectedAfter) })
@@ -205,18 +209,18 @@ open class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subproces
                 throw TotalFailureException("A non-directory cannot be a top-level backup object.")
 
             // Source file checks: At the end of it, a source file must exist and it gets confirmed that it is a symbolic link and not something else.
-            if (! subprocessor.exists(sourcePath))
+            if (! subprocessor.existsLocal(sourcePath))
                 throw TotalFailureException("Source symlink $sourcePath does not exist.", this)
-            if (! subprocessor.isSymbolicLink(sourcePath))
+            if (! subprocessor.isSymbolicLinkLocal(sourcePath))
                 throw TotalFailureException("Source symlink $sourcePath is not a symbolic link.", this)
             symlink.isSymbolicLink = true
 
             // Destination file checks: At the end of it, the destination file must not exist before the copying starts. This is to ensure that something important does not get overwritten by accident.
-            if (subprocessor.exists(destinationPath))
+            if (subprocessor.existsRemote(destinationPath))
                 throw TotalFailureException("Destination symlink $destinationPath already exists.", this)
 
             // TODO: mtime and permissions are not preserved.
-            subprocessor.copySymbolicLink(sourcePath, destinationPath)
+            subprocessor.copySymbolicLinkRemote(sourcePath, destinationPath)
         },{
             // Symbolic link was copied successfully. Statistics get updated, and a green status printed.
             process.processedCount++

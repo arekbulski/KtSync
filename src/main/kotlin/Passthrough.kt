@@ -3,6 +3,8 @@ import java.nio.file.attribute.PosixFilePermission
 
 abstract class Passthrough(val subprocessor: Processor) : Processor() {
 
+//----------------------------------------------------------------------------------------------------------------------
+
     override fun backupProcess(process: ProcessingProcess) {
         subprocessor.backupProcess(process)
     }
@@ -18,6 +20,8 @@ abstract class Passthrough(val subprocessor: Processor) : Processor() {
     override fun backupSymbolicLink(symlink: ProcessingFile) {
         subprocessor.backupSymbolicLink(symlink)
     }
+
+//----------------------------------------------------------------------------------------------------------------------
 
     override fun initFolderProgress(folder: ProcessingFile) {
         subprocessor.initFolderProgress(folder)
@@ -47,9 +51,13 @@ abstract class Passthrough(val subprocessor: Processor) : Processor() {
         subprocessor.finishSymbolicLinkProgress(symlink, result)
     }
 
+//----------------------------------------------------------------------------------------------------------------------
+
     override fun estimateFolder(process: ProcessingProcess, folder: String) {
         subprocessor.estimateFolder(process, folder)
     }
+
+//----------------------------------------------------------------------------------------------------------------------
 
     override fun initEstimationProgress(process: ProcessingProcess) {
         subprocessor.initEstimationProgress(process)
@@ -62,6 +70,8 @@ abstract class Passthrough(val subprocessor: Processor) : Processor() {
     override fun finishEstimationProgress(process: ProcessingProcess) {
         subprocessor.finishEstimationProgress(process)
     }
+
+//----------------------------------------------------------------------------------------------------------------------
 
     override fun absolute(pathname: String): String {
         return subprocessor.absolute(pathname)
@@ -79,56 +89,38 @@ abstract class Passthrough(val subprocessor: Processor) : Processor() {
         return subprocessor.extractName(pathname)
     }
 
-    override fun exists(pathname: String): Boolean {
-        return subprocessor.exists(pathname)
+//----------------------------------------------------------------------------------------------------------------------
+
+    override fun existsLocal(pathname: String): Boolean {
+        return subprocessor.existsLocal(pathname)
     }
 
-    override fun isRegularFile(pathname: String): Boolean {
-        return subprocessor.isRegularFile(pathname)
+    override fun isRegularFileLocal(pathname: String): Boolean {
+        return subprocessor.isRegularFileLocal(pathname)
     }
 
-    override fun isFolder(pathname: String): Boolean {
-        return subprocessor.isFolder(pathname)
+    override fun isFolderLocal(pathname: String): Boolean {
+        return subprocessor.isFolderLocal(pathname)
     }
 
-    override fun isSymbolicLink(pathname: String): Boolean {
-        return subprocessor.isSymbolicLink(pathname)
+    override fun isSymbolicLinkLocal(pathname: String): Boolean {
+        return subprocessor.isSymbolicLinkLocal(pathname)
     }
 
-    override fun renameTo(pathname: String, newname: String) {
-        return subprocessor.renameTo(pathname, newname)
+    override fun listFolderEntriesLocal(pathname: String): List<String> {
+        return subprocessor.listFolderEntriesLocal(pathname)
     }
 
-    override fun createFolder(pathname: String) {
-        return subprocessor.createFolder(pathname)
+    override fun getFileSizeLocal(pathname: String): Long {
+        return subprocessor.getFileSizeLocal(pathname)
     }
 
-    override fun createRegularFile(pathname: String) {
-        return subprocessor.createRegularFile(pathname)
+    override fun getModificationTimeLocal(pathname: String): FileTime {
+        return subprocessor.getModificationTimeLocal(pathname)
     }
 
-    override fun listFolderEntries(pathname: String): List<String> {
-        return subprocessor.listFolderEntries(pathname)
-    }
-
-    override fun getFileSize(pathname: String): Long {
-        return subprocessor.getFileSize(pathname)
-    }
-
-    override fun getModificationTime(pathname: String): FileTime {
-        return subprocessor.getModificationTime(pathname)
-    }
-
-    override fun setModificationTime(pathname: String, mtime: FileTime) {
-        subprocessor.setModificationTime(pathname, mtime)
-    }
-
-    override fun getPosixPermissions(pathname: String): Set<PosixFilePermission> {
-        return subprocessor.getPosixPermissions(pathname)
-    }
-
-    override fun setPosixPermissions(pathname: String, permissions: Set<PosixFilePermission>) {
-        subprocessor.setPosixPermissions(pathname, permissions)
+    override fun getPosixPermissionsLocal(pathname: String): Set<PosixFilePermission> {
+        return subprocessor.getPosixPermissionsLocal(pathname)
     }
 
     @ExperimentalUnsignedTypes
@@ -141,16 +133,60 @@ abstract class Passthrough(val subprocessor: Processor) : Processor() {
         subprocessor.writeFileContent(pathname, data)
     }
 
-    override fun copyFileProgressively(sourcePath: String, destinationPath: String, onUpdate: (Long) -> Unit, onSuccess: () -> Unit, onFailure: () -> Unit) {
-        subprocessor.copyFileProgressively(sourcePath, destinationPath, onUpdate, onSuccess, onFailure)
+//----------------------------------------------------------------------------------------------------------------------
+
+    override fun encodeNameRemote(name: String): String {
+        return subprocessor.encodeNameRemote(name)
     }
 
-    override fun cloneFile(sourcePath: String, destinationPath: String) {
-        subprocessor.cloneFile(sourcePath, destinationPath)
+    override fun existsRemote(pathname: String): Boolean {
+        return subprocessor.existsRemote(pathname)
     }
 
-    override fun copySymbolicLink(sourcePath: String, destinationPath: String) {
-        subprocessor.copySymbolicLink(sourcePath, destinationPath)
+    override fun renameToRemote(pathname: String, newname: String) {
+        return subprocessor.renameToRemote(pathname, newname)
     }
+
+    override fun createFolderRemote(pathname: String) {
+        return subprocessor.createFolderRemote(pathname)
+    }
+
+    override fun createRegularFileRemote(pathname: String) {
+        return subprocessor.createRegularFileRemote(pathname)
+    }
+
+    override fun getFileSizeRemote(pathname: String): Long {
+        return subprocessor.getFileSizeRemote(pathname)
+    }
+
+    override fun getModificationTimeRemote(pathname: String): FileTime {
+        return subprocessor.getModificationTimeRemote(pathname)
+    }
+
+    override fun setModificationTimeRemote(pathname: String, mtime: FileTime) {
+        subprocessor.setModificationTimeRemote(pathname, mtime)
+    }
+
+    override fun getPosixPermissionsRemote(pathname: String): Set<PosixFilePermission> {
+        return subprocessor.getPosixPermissionsRemote(pathname)
+    }
+
+    override fun setPosixPermissionsRemote(pathname: String, permissions: Set<PosixFilePermission>) {
+        subprocessor.setPosixPermissionsRemote(pathname, permissions)
+    }
+
+    override fun copyFileProgressivelyRemote(sourcePath: String, destinationPath: String, onUpdate: (Long) -> Unit, onSuccess: () -> Unit, onFailure: () -> Unit) {
+        subprocessor.copyFileProgressivelyRemote(sourcePath, destinationPath, onUpdate, onSuccess, onFailure)
+    }
+
+    override fun cloneFileRemote(sourcePath: String, destinationPath: String) {
+        subprocessor.cloneFileRemote(sourcePath, destinationPath)
+    }
+
+    override fun copySymbolicLinkRemote(sourcePath: String, destinationPath: String) {
+        subprocessor.copySymbolicLinkRemote(sourcePath, destinationPath)
+    }
+
+//----------------------------------------------------------------------------------------------------------------------
 
 }
