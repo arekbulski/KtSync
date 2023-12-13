@@ -4,15 +4,15 @@ import java.time.format.DateTimeFormatter
 
 // This function transforms number of bytes to a string eg. 5000 -> "5.0 KB".
 fun suffixedFileSize (n: Long): String {
-    if (n < 1024L)
+    if (n < 1000L)
         return "$n B"
-    if (n < 1024*1024L)
-        return "${"%.1f".format(n/1024.0)} KB"
-    if (n < 1024*1024*1024L)
-        return "${"%.1f".format(n/1024.0/1024.0)} MB"
-    if (n < 1024*1024*1024*1024L)
-        return "${"%.1f".format(n/1024.0/1024.0/1024.0)} GB"
-    return "${"%.1f".format(n/1024.0/1024.0/1024.0/1024.0)} TB"
+    if (n < 1000L*1000L)
+        return "${"%.1f".format(n/1000.0)} KB"
+    if (n < 1000L*1000L*1000L)
+        return "${"%.1f".format(n/1000.0/1000.0)} MB"
+    if (n < 1000L*1000L*1000L*1000L)
+        return "${"%.1f".format(n/1000.0/1000.0/1000.0)} GB"
+    return "${"%.1f".format(n/1000.0/1000.0/1000.0/1000.0)} TB"
 }
 
 // This function transforms a number of files to a string eg. 10 -> "10 files".
@@ -22,15 +22,15 @@ fun suffixedFileCount (n: Long): String {
 
 // This function transforms a byte throughput to a string eg. 5000 -> "5.0 KB/sec".
 fun suffixedByteThroughput (s: Double): String {
-    if (s < 1024L)
+    if (s < 1000L)
         return "${"%.1f".format(s)} B/sec"
-    if (s < 1024*1024L)
-        return "${"%.1f".format(s/1024.0)} KB/sec"
-    if (s < 1024*1024*1024L)
-        return "${"%.1f".format(s/1024.0/1024.0)} MB/sec"
-    if (s < 1024*1024*1024*1024L)
-        return "${"%.1f".format(s/1024.0/1024.0/1024.0)} GB/sec"
-    return "${"%.1f".format(s/1024.0/1024.0/1024.0/1024.0)} TB/sec"
+    if (s < 1000L*1000L)
+        return "${"%.1f".format(s/1000.0)} KB/sec"
+    if (s < 1000L*1000L*1000L)
+        return "${"%.1f".format(s/1000.0/1000.0)} MB/sec"
+    if (s < 1000L*1000L*1000L*1000L)
+        return "${"%.1f".format(s/1000.0/1000.0/1000.0)} GB/sec"
+    return "${"%.1f".format(s/1000.0/1000.0/1000.0/1000.0)} TB/sec"
 }
 
 // This function transforms a file throughput to a string eg. 10 -> "10.0 files/sec".
