@@ -1,4 +1,3 @@
-import com.github.ajalt.mordant.rendering.TextColors
 import com.github.ajalt.mordant.rendering.TextColors.brightMagenta
 
 // This class is a passthrough class, it prints the arguments/results between the processor above and processor below it. It does not catch any exceptions.
@@ -7,7 +6,7 @@ class Debug (subprocessor: Processor) : Passthrough (subprocessor) {
 
     val EnableDebugPrinting = false
 
-    override fun backupProcess(process: ProcessingProcess) {
+    override fun backupProcess(process: ProcessingJob) {
         val terminal = process.terminal!!
         if (EnableDebugPrinting)
             terminal.println((brightMagenta)("(debug) into backupProcess ($process)"))

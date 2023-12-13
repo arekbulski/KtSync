@@ -5,7 +5,7 @@ class MainRunner (val subprocessor: Processor) {
 
     fun run () {
         // TODO: This configuration needs to be read from a JSON file or from the terminal. For now the operation arguments are hardcoded into the code.
-        val process = ProcessingProcess().apply {
+        val process = ProcessingJob().apply {
             profile = Profile().apply {
                 operation = "backup"
                 algorithm = "full"

@@ -6,7 +6,7 @@ abstract class Processor {
 
 //----------------------------------------------------------------------------------------------------------------------
 
-    open fun backupProcess (process: ProcessingProcess) {
+    open fun backupProcess (process: ProcessingJob) {
         throw NotImplementedError()
     }
 
@@ -54,19 +54,19 @@ abstract class Processor {
 
 //----------------------------------------------------------------------------------------------------------------------
 
-    open fun estimateFolder (process: ProcessingProcess, folder: String) {
+    open fun estimateFolder (process: ProcessingJob, folder: String) {
         throw NotImplementedError()
     }
 
-    open fun initEstimationProgress (process: ProcessingProcess) {
+    open fun initEstimationProgress (process: ProcessingJob) {
         throw NotImplementedError()
     }
 
-    open fun updateEstimationProgress (process: ProcessingProcess) {
+    open fun updateEstimationProgress (process: ProcessingJob) {
         throw NotImplementedError()
     }
 
-    open fun finishEstimationProgress (process: ProcessingProcess) {
+    open fun finishEstimationProgress (process: ProcessingJob) {
         throw NotImplementedError()
     }
 

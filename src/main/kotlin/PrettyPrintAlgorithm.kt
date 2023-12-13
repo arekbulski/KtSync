@@ -10,7 +10,7 @@ import java.time.LocalDateTime
 // This class establishes pretty printed chapters and results. Note that this class does not handle pretty printing of individual files and folders, or while streaming files. That is the job of PrettyPrintFiles class.
 class PrettyPrintAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) {
 
-    override fun backupProcess(process: ProcessingProcess) {
+    override fun backupProcess(process: ProcessingJob) {
         val profile = process.profile!!
 
         process.terminal = Terminal()

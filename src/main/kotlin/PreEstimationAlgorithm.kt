@@ -4,7 +4,7 @@ class PreEstimationAlgorithm (subprocessor: Processor) : Passthrough(subprocesso
 
     // This method traverses the source branch (non-recursively) and counts number and size of files and adds those up. It also displays progress while it is doing it.
     // TODO: If regular files can be top-level backed up objects, then this needs a redo.
-    override fun estimateFolder(process: ProcessingProcess, folder: String) {
+    override fun estimateFolder(process: ProcessingJob, folder: String) {
         process.estimatedCount = 0
         process.estimatedBytes = 0
         val queue = arrayListOf(subprocessor.absolute(folder))

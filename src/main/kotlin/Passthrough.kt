@@ -5,7 +5,7 @@ abstract class Passthrough(val subprocessor: Processor) : Processor() {
 
 //----------------------------------------------------------------------------------------------------------------------
 
-    override fun backupProcess(process: ProcessingProcess) {
+    override fun backupProcess(process: ProcessingJob) {
         subprocessor.backupProcess(process)
     }
 
@@ -53,21 +53,21 @@ abstract class Passthrough(val subprocessor: Processor) : Processor() {
 
 //----------------------------------------------------------------------------------------------------------------------
 
-    override fun estimateFolder(process: ProcessingProcess, folder: String) {
+    override fun estimateFolder(process: ProcessingJob, folder: String) {
         subprocessor.estimateFolder(process, folder)
     }
 
 //----------------------------------------------------------------------------------------------------------------------
 
-    override fun initEstimationProgress(process: ProcessingProcess) {
+    override fun initEstimationProgress(process: ProcessingJob) {
         subprocessor.initEstimationProgress(process)
     }
 
-    override fun updateEstimationProgress(process: ProcessingProcess) {
+    override fun updateEstimationProgress(process: ProcessingJob) {
         subprocessor.updateEstimationProgress(process)
     }
 
-    override fun finishEstimationProgress(process: ProcessingProcess) {
+    override fun finishEstimationProgress(process: ProcessingJob) {
         subprocessor.finishEstimationProgress(process)
     }
 

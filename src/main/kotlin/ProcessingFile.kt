@@ -2,7 +2,7 @@
 // This class represents a backup/restore item (a file, directory, symbolic link, even unknown types).
 class ProcessingFile {
 
-    var process: ProcessingProcess? = null
+    var process: ProcessingJob? = null
 
     var sourcePath: String? = null
     var destinationPath: String? = null

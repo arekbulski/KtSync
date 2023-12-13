@@ -3,7 +3,7 @@
 class NothingImplemented : Processor() {
 
     // This needs to bounce.
-    override fun backupProcess(process: ProcessingProcess) {
+    override fun backupProcess(process: ProcessingJob) {
     }
 
 }

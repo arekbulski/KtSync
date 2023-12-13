@@ -132,7 +132,7 @@ class PrettyPrintFiles (subprocessor: Processor) : Passthrough(subprocessor) {
         terminal.println((brightMagenta)("progress is ${process.processedCount} ${suffixedFileSize(process.processedBytes)} out of ${process.estimatedCount} ${suffixedFileSize(process.estimatedBytes)}"))
     }
 
-    override fun initEstimationProgress(process: ProcessingProcess) {
+    override fun initEstimationProgress(process: ProcessingJob) {
         val terminal = process.terminal!!
 
         terminal.println(Markdown("""
@@ -146,14 +146,14 @@ class PrettyPrintFiles (subprocessor: Processor) : Passthrough(subprocessor) {
         process.progressbar = progressbar
     }
 
-    override fun updateEstimationProgress(process: ProcessingProcess) {
+    override fun updateEstimationProgress(process: ProcessingJob) {
         val terminal = process.terminal!!
         val progressbar = process.progressbar!!
 
         progressbar.update(process.estimatedCount)
     }
 
-    override fun finishEstimationProgress(process: ProcessingProcess) {
+    override fun finishEstimationProgress(process: ProcessingJob) {
         val terminal = process.terminal!!
         val progressbar = process.progressbar!!
 
