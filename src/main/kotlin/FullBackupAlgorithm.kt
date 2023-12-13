@@ -172,9 +172,14 @@ open class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subproces
                 val progressBefore = process.processedBytes
                 val progressExpectedAfter = progressBefore + file.size
                 subprocessor.copyFileProgressivelyRemote(sourcePath, destinationPath,
-                    { at -> subprocessor.updateFileProgress(file, progressBefore + at) },
-                    { subprocessor.updateFileProgress(file, progressExpectedAfter) },
-                    { subprocessor.updateFileProgress(file, progressExpectedAfter) })
+                {
+                    at -> subprocessor.updateFileProgress(file, progressBefore + at)
+                }, {
+                    subprocessor.updateFileProgress(file, progressExpectedAfter)
+                }, {
+                    subprocessor.updateFileProgress(file, progressExpectedAfter)
+                    throw it
+                })
             }
         },{
             // File was copied successfully. Statistics get updated, and a green status printed.

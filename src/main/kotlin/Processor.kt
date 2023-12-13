@@ -188,7 +188,7 @@ abstract class Processor {
         throw NotImplementedError()
     }
 
-    open fun copyFileProgressivelyRemote (sourcePath: String, destinationPath: String, onUpdate: (Long) -> Unit, onSuccess: () -> Unit, onFailure: () -> Unit ) {
+    open fun copyFileProgressivelyRemote (sourcePath: String, destinationPath: String, onUpdate: ((Long) -> Unit)?, onSuccess: (() -> Unit)?, onFailure: ((Exception) -> Unit)? ) {
         throw NotImplementedError()
     }
 

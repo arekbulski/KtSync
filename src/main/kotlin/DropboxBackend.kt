@@ -122,7 +122,7 @@ class DropboxBackend (subprocessor: Processor) : LocalDiskBackend(subprocessor) 
         throw NotImplementedError()
     }
 
-    override fun copyFileProgressivelyRemote(sourcePath: String, destinationPath: String, onUpdate: (Long) -> Unit, onSuccess: () -> Unit, onFailure: () -> Unit) {
+    override fun copyFileProgressivelyRemote(sourcePath: String, destinationPath: String, onUpdate: ((Long) -> Unit)?, onSuccess: (() -> Unit)?, onFailure: ((Exception) -> Unit)?) {
         try {
 
             FileInputStream(File(sourcePath)).use { inputStream ->
@@ -130,7 +130,7 @@ class DropboxBackend (subprocessor: Processor) : LocalDiskBackend(subprocessor) 
                     .withMode(WriteMode.ADD)
                     .withAutorename(false)
                     .withMute(true)
-                    .uploadAndFinish(inputStream) { onUpdate(it) }
+                    .uploadAndFinish(inputStream) { onUpdate?.invoke(it) }
             }
 
             propagateCombined({
@@ -140,13 +140,11 @@ class DropboxBackend (subprocessor: Processor) : LocalDiskBackend(subprocessor) 
                 throw PartialFailureException("Could not get/set mtime/permissions from file $sourcePath to file $destinationPath.", this, it)
             })
 
-            onSuccess.invoke()
+            onSuccess?.invoke()
         } catch (e: PartialFailureException) {
-            onFailure.invoke()
-            throw e
+            onFailure?.invoke(e)
         } catch (e: Exception) {
-            onFailure.invoke()
-            throw TotalFailureException("Dropbox API failed.", this, e)
+            onFailure?.invoke(TotalFailureException("Dropbox API failed.", this, e))
         }
     }
 

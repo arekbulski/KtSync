@@ -187,7 +187,7 @@ abstract class Passthrough(val subprocessor: Processor) : Processor() {
         subprocessor.setPosixPermissionsRemote(pathname, permissions)
     }
 
-    override fun copyFileProgressivelyRemote(sourcePath: String, destinationPath: String, onUpdate: (Long) -> Unit, onSuccess: () -> Unit, onFailure: () -> Unit) {
+    override fun copyFileProgressivelyRemote(sourcePath: String, destinationPath: String, onUpdate: ((Long) -> Unit)?, onSuccess: (() -> Unit)?, onFailure: ((Exception) -> Unit)?) {
         subprocessor.copyFileProgressivelyRemote(sourcePath, destinationPath, onUpdate, onSuccess, onFailure)
     }
 

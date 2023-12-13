@@ -228,7 +228,7 @@ open class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor
 
     // Note this method creates an empty file atomically, it never overwrites an existing file.
     // Note that [sourcePath] always refers to existing file, and [destinationPath] is always created.
-    override fun copyFileProgressivelyRemote (sourcePath: String, destinationPath: String, onUpdate: (Long) -> Unit, onSuccess: () -> Unit, onFailure: () -> Unit) {
+    override fun copyFileProgressivelyRemote (sourcePath: String, destinationPath: String, onUpdate: ((Long) -> Unit)?, onSuccess: (() -> Unit)?, onFailure: ((Exception) -> Unit)?) {
         try {
             // This method throws a TotalFailureException.
             this.createRegularFileRemote(destinationPath)
@@ -245,12 +245,11 @@ open class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor
                                 break
                             outputStream.write(buffer, 0, amount)
                             progress += amount
-                            onUpdate.invoke(progress)
+                            onUpdate?.invoke(progress)
                         }
                     }
                 }
             }, null, {
-                // TODO: Trash a partially copied file?
                 throw TotalFailureException("Failed to stream copy content from file $sourcePath to file $destinationPath", this, it)
             })
 
@@ -267,10 +266,11 @@ open class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor
                 throw PartialFailureException("Could not get/set permissions from file $sourcePath to file $destinationPath.", this, it)
             })
 
-            onSuccess.invoke()
+            onSuccess?.invoke()
+        } catch (e: PartialFailureException) {
+            onFailure?.invoke(e)
         } catch (e: Exception) {
-            onFailure.invoke()
-            throw e
+            onFailure?.invoke(TotalFailureException("Failed to copy file $sourcePath.", this, e))
         }
     }
 
