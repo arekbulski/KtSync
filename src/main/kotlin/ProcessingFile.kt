@@ -7,6 +7,8 @@ class ProcessingFile {
     var sourcePath: String? = null
     var destinationPath: String? = null
     var previousPath: String? = null
+    var relativePath: String? = null
+
     var isRoot: Boolean = false
 
     var isFolder: Boolean = false
@@ -15,7 +17,7 @@ class ProcessingFile {
     var size: Long = 0L
 
     override fun toString(): String {
-        return "ProcessingFile: from $sourcePath, to $destinationPath, previous $previousPath" +
+        return "ProcessingFile: relativepath=$relativePath ; " +
             "root=$isRoot, regular=$isRegularFile, symlink=$isSymbolicLink, folder=$isFolder, " +
             "size=$size (${suffixedFileSize(size)})"
     }

@@ -49,8 +49,7 @@ class PrettyPrintAlgorithm (subprocessor: Processor) : Passthrough(subprocessor)
             terminal.println(Markdown("""
                 ## Issues
             """.trimIndent()))
-            for ((path, exception) in process.failedEntries) {
-                val relativePath = subprocessor.relative(path, subprocessor.absolute(process.profile!!.sourcePath!!))
+            for ((relativePath, exception) in process.failedEntries) {
                 terminal.println(Markdown("""
                     * ${(brightWhite)(relativePath)} was not backed up due to ${(if (exception is PartialFailureException && exception !is TotalFailureException) brightYellow else brightRed)(exception.toString())}.
                 """.trimIndent()))

@@ -20,6 +20,7 @@ open class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subproces
             this.sourcePath = subprocessor.absolute(sourcePath)
             this.destinationPath = subprocessor.absolute(destinationPath)
             this.previousPath = null
+            this.relativePath = "/"
             this.isRoot = true
         }
 
@@ -75,6 +76,7 @@ open class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subproces
         val entries = subprocessor.listFolderEntriesLocal(sourcePath)
         var failedLocally = 0L
         val previousPathOrNull = folder.previousPath
+        val relativePath = folder.relativePath!!
 
         // Note that any failure, even a TotalFailure or unclassified exception, when copying a sub-file does not stop it's parent from attempting to copy the other entries. However, it does imply a PartialFailure at the end of this method.
         for (entryPathname in entries) {
@@ -85,6 +87,7 @@ open class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subproces
                     this.destinationPath = subprocessor.resolve(destinationPath, subprocessor.extractName(entryPathname))
                     if (previousPathOrNull != null)
                         this.previousPath = subprocessor.resolve(previousPathOrNull, subprocessor.extractName(entryPathname))
+                    this.relativePath = subprocessor.resolve(relativePath, subprocessor.extractName(entryPathname))
                     this.isRoot = false
                     this.isFolder = subprocessor.isFolderLocal(entryPathname)
                     this.isRegularFile = subprocessor.isRegularFileLocal(entryPathname)
@@ -110,7 +113,8 @@ open class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subproces
             // If an entry does not get copied correctly, it is listed in the [failedEntries] map. That (insertion ordered) map gets reported in Issues chapter after the backup job finished. Note that this catch clause is not limited to Partial/Total Failure.
             catch (e: Exception) {
                 failedLocally++
-                process.failedEntries[entryPathname] = e
+                val entryRelativePath = subprocessor.relative(entryPathname, sourcePath)
+                process.failedEntries[entryRelativePath] = e
             }
         }
 

@@ -14,7 +14,7 @@ class PrettyPrintFiles (subprocessor: Processor) : Passthrough(subprocessor) {
         val profile = process.profile!!
         val terminal = process.terminal!!
 
-        val relativePath = subprocessor.relative(folder.sourcePath!!, subprocessor.absolute(profile.sourcePath!!))
+        val relativePath = folder.relativePath!!
         terminal.println(Markdown("""
             * ${(brightWhite)(relativePath)} a folder 
         """.trimIndent()))
@@ -47,7 +47,7 @@ class PrettyPrintFiles (subprocessor: Processor) : Passthrough(subprocessor) {
         val profile = process.profile!!
         val terminal = process.terminal!!
 
-        val relativePath = subprocessor.relative(file.sourcePath!!, subprocessor.absolute(profile.sourcePath!!))
+        val relativePath = file.relativePath!!
         if (file.isRegularFile) {
             terminal.println(Markdown("""
                 * ${(brightWhite)(relativePath)} (${(brightWhite)(suffixedFileSize(file.size))}) a regular file 
@@ -104,7 +104,7 @@ class PrettyPrintFiles (subprocessor: Processor) : Passthrough(subprocessor) {
         val profile = process.profile!!
         val terminal = process.terminal!!
 
-        val relativePath = subprocessor.relative(symlink.sourcePath!!, subprocessor.absolute(profile.sourcePath!!))
+        val relativePath = symlink.relativePath!!
         terminal.println(Markdown("""
             * ${(brightWhite)(relativePath)} a symbolic link
         """.trimIndent()))
