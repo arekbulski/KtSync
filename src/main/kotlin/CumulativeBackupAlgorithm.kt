@@ -6,6 +6,7 @@ class CumulativeBackupAlgorithm (subprocessor: Processor) : FullBackupAlgorithm(
         val sourcePath = file.sourcePath!!
         val previousPath = file.previousPath!!
 
+        // TODO: the 2 remote calls could be combined into 1.
         return subprocessor.existsRemote(previousPath) &&
             subprocessor.getMetadataLocal(sourcePath).isSameAs(subprocessor.getMetadataRemote(previousPath))
     }
