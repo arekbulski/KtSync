@@ -8,8 +8,11 @@ class Profile {
     var sourcePath: String? = null
     var destinationPath: String? = null
 
+    var accessToken: String? = null
+
     override fun toString(): String {
-        return "Profile: op=$operation algo=$algorithm, from $sourcePath, to $destinationPath"
+        return "Profile: op=$operation algo=$algorithm, from $sourcePath, to $destinationPath, "+
+                "accesstoken=(${if (accessToken != null) "${accessToken!!.length}" else "absent"})"
     }
 
 }

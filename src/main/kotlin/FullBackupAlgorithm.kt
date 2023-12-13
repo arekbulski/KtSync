@@ -9,6 +9,9 @@ open class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subproces
         val sourcePath = profile.sourcePath!!
         val destinationPath = profile.destinationPath!!
 
+        // Allows other processors to initialize.
+        subprocessor.backupProcess(process)
+
         // Indexes the entire source branch (with sub-folders) and counts files. The cumulative amount/size is stored inside the ProcessingProcess data-structure.
         subprocessor.estimateFolder(process, sourcePath)
 
