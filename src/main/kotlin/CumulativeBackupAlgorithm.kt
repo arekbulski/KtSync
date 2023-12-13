@@ -1,4 +1,5 @@
 
+// This is basically FullBackupAlgorithm but allows for cloning unmodified files. Rest is the same.
 class CumulativeBackupAlgorithm (subprocessor: Processor) : FullBackupAlgorithm(subprocessor) {
 
     override fun chooseCloning(file: ProcessingFile): Boolean {
@@ -6,8 +7,7 @@ class CumulativeBackupAlgorithm (subprocessor: Processor) : FullBackupAlgorithm(
         val previousPath = file.previousPath!!
 
         return subprocessor.existsRemote(previousPath) &&
-            subprocessor.getFileSizeLocal(sourcePath) == subprocessor.getFileSizeRemote(previousPath) &&
-            subprocessor.getModificationTimeLocal(sourcePath) == subprocessor.getModificationTimeRemote(previousPath)
+            subprocessor.getMetadataLocal(sourcePath).isSameAs(subprocessor.getMetadataRemote(previousPath))
     }
 
 }

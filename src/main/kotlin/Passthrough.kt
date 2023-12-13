@@ -111,6 +111,10 @@ abstract class Passthrough(val subprocessor: Processor) : Processor() {
         return subprocessor.listFolderEntriesLocal(pathname)
     }
 
+    override fun getMetadataLocal(pathname: String): MetadataStruct {
+        return subprocessor.getMetadataLocal(pathname)
+    }
+
     override fun getFileSizeLocal(pathname: String): Long {
         return subprocessor.getFileSizeLocal(pathname)
     }
@@ -153,6 +157,14 @@ abstract class Passthrough(val subprocessor: Processor) : Processor() {
 
     override fun createRegularFileRemote(pathname: String) {
         return subprocessor.createRegularFileRemote(pathname)
+    }
+
+    override fun getMetadataRemote(pathname: String): MetadataStruct {
+        return subprocessor.getMetadataRemote(pathname)
+    }
+
+    override fun setMetadataRemote(pathname: String, metadata: MetadataStruct) {
+        subprocessor.setMetadataRemote(pathname, metadata)
     }
 
     override fun getFileSizeRemote(pathname: String): Long {

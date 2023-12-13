@@ -6,11 +6,12 @@ import java.nio.file.LinkOption
 import java.nio.file.StandardOpenOption
 import java.nio.file.attribute.FileTime
 import java.nio.file.attribute.PosixFilePermission
+import java.nio.file.attribute.PosixFilePermissions
 import kotlin.io.path.fileSize
 import kotlin.io.path.pathString
 
 // This class exposes filesystem operations in a somewhat agnostic way.
-class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor) {
+open class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor) {
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -88,6 +89,15 @@ class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor) {
             throw e
         } catch (e: Exception) {
             throw TotalFailureException("Failed to list entries in folder $pathname.", this, e)
+        }
+    }
+
+    override fun getMetadataLocal(pathname: String): MetadataStruct {
+        return MetadataStruct().apply {
+            size = getFileSizeLocal(pathname)
+            modificationTime = getModificationTimeLocal(pathname).toMillis()
+            posixPermissions = PosixFilePermissions.toString(getPosixPermissionsLocal(pathname))
+            isSymbolicLink = isSymbolicLinkLocal(pathname)
         }
     }
 
@@ -177,6 +187,15 @@ class LocalDiskBackend (subprocessor: Processor) : Passthrough(subprocessor) {
         } catch (e: Exception) {
             throw TotalFailureException("Failed to create a regular file $pathname.", this, e)
         }
+    }
+
+    override fun getMetadataRemote(pathname: String): MetadataStruct {
+        return this.getMetadataLocal(pathname)
+    }
+
+    override fun setMetadataRemote(pathname: String, metadata: MetadataStruct) {
+        this.setModificationTimeRemote(pathname, FileTime.fromMillis(metadata.modificationTime))
+        this.setPosixPermissionsRemote(pathname, PosixFilePermissions.fromString(metadata.posixPermissions))
     }
 
     override fun getFileSizeRemote (pathname: String): Long {

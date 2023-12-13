@@ -110,6 +110,10 @@ abstract class Processor {
         throw NotImplementedError()
     }
 
+    open fun getMetadataLocal (pathname: String): MetadataStruct {
+        throw NotImplementedError()
+    }
+
     open fun getFileSizeLocal (pathname: String): Long {
         throw NotImplementedError()
     }
@@ -153,6 +157,14 @@ abstract class Processor {
     }
 
     open fun createRegularFileRemote (pathname: String) {
+        throw NotImplementedError()
+    }
+
+    open fun getMetadataRemote (pathname: String): MetadataStruct {
+        throw NotImplementedError()
+    }
+
+    open fun setMetadataRemote (pathname: String, metadata: MetadataStruct) {
         throw NotImplementedError()
     }
 

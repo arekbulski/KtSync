@@ -34,28 +34,29 @@ open class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subproces
         val sourcePath = folder.sourcePath!!
         val destinationPath = folder.destinationPath!!
 
-        // Source folder checks (not just root): At the end of it, a source folder must exist and well, be a folder and not a symbolic link to a folder or anything else.
-        if (! subprocessor.existsLocal(sourcePath))
-            throw TotalFailureException("Source folder $sourcePath does not exist.", this)
-        if (! subprocessor.isFolderLocal(sourcePath))
-            throw TotalFailureException("Source folder $sourcePath is not a folder.", this)
-        folder.isFolder = true
-
-        // Destination folder checks (not just root): At the end of it, the destination folder must not exist, although in case of the root folder a rename is performed.
-        if (subprocessor.existsRemote(destinationPath)) {
-            if (folder.isRoot) {
-                val destinationRenamed = generateTrashPathname(destinationPath)
-                subprocessor.renameToRemote(destinationPath, destinationRenamed)
-                folder.previousPath = destinationRenamed
-                process.destinationRenamedTo = subprocessor.extractName(destinationRenamed)
-            } else {
-                throw TotalFailureException("Destination folder $destinationPath already exists.", this)
-            }
-        }
-
         // This only creates an empty folder. The green status in the terminal below the item only means "folder created", as sub-folders were not created yet, sub-files were not copied yet, nor were mtime or permissions assigned yet. Note that failure to create a folder does constitute a TotalFailure, while any issues afterwards only constitute a PartialFailure.
         propagateCombined({
             subprocessor.initFolderProgress(folder)
+
+            // Source folder checks (not just root): At the end of it, a source folder must exist and well, be a folder and not a symbolic link to a folder or anything else.
+            if (! subprocessor.existsLocal(sourcePath))
+                throw TotalFailureException("Source folder $sourcePath does not exist.", this)
+            if (! subprocessor.isFolderLocal(sourcePath))
+                throw TotalFailureException("Source folder $sourcePath is not a folder.", this)
+            folder.isFolder = true
+
+            // Destination folder checks (not just root): At the end of it, the destination folder must not exist, although in case of the root folder a rename is performed.
+            if (subprocessor.existsRemote(destinationPath)) {
+                if (folder.isRoot) {
+                    val destinationRenamed = generateTrashPathname(destinationPath)
+                    subprocessor.renameToRemote(destinationPath, destinationRenamed)
+                    folder.previousPath = destinationRenamed
+                    process.destinationRenamedTo = subprocessor.extractName(destinationRenamed)
+                } else {
+                    throw TotalFailureException("Destination folder $destinationPath already exists.", this)
+                }
+            }
+
             subprocessor.createFolderRemote(destinationPath)
         },{
             // Root folder does not count towards processed entries.
@@ -104,7 +105,7 @@ open class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subproces
                     this.backupSymbolicLink(entry)
                     continue
                 }
-                throw TotalFailureException("Unknown entry type $entryPathname")
+                throw TotalFailureException("Unknown file type $entryPathname")
             }
             // If an entry does not get copied correctly, it is listed in the [failedEntries] map. That (insertion ordered) map gets reported in Issues chapter after the backup job finished. Note that this catch clause is not limited to Partial/Total Failure.
             catch (e: Exception) {
@@ -113,25 +114,19 @@ open class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subproces
             }
         }
 
+        var failedAtMetadata: Exception? = null
+        propagateCombined({
+            val metadata = subprocessor.getMetadataLocal(sourcePath)
+            subprocessor.setMetadataRemote(destinationPath, metadata)
+        }, null, {
+            failedAtMetadata = it
+        })
+
         // Note that even a TotalFailure caused when copying an entry only causes a PartialFailure for it's parent directory.
         if (failedLocally > 0)
-            throw PartialFailureException("Source folder $sourcePath failed to backup $failedLocally entries.", this)
-
-        // Failure to preserve mtime or permissions also constitutes a PartialFailure.
-        propagateCombined({
-            val mtime = subprocessor.getModificationTimeLocal(sourcePath)
-            subprocessor.setModificationTimeRemote(destinationPath, mtime)
-        }, null, {
-            throw PartialFailureException("Could not get/set mtime from folder $sourcePath to folder $destinationPath.", this, it)
-        })
-
-        // Failure to preserve mtime or permissions also constitutes a PartialFailure.
-        propagateCombined({
-            val permissions = subprocessor.getPosixPermissionsLocal(sourcePath)
-            subprocessor.setPosixPermissionsRemote(destinationPath, permissions)
-        }, null, {
-            throw PartialFailureException("Could not get/set permissions from file $sourcePath to file $destinationPath.", this, it)
-        })
+            throw PartialFailureException("Source folder $sourcePath failed to backup $failedLocally entries.", this, null)
+        if (failedAtMetadata != null)
+            throw PartialFailureException("Source folder $sourcePath failed to set metadata.", this, failedAtMetadata)
 
         // Root folder does not count towards successfully copied entries.
         if (! folder.isRoot)

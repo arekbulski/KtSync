@@ -18,7 +18,7 @@ class PrettyPrintAlgorithm (subprocessor: Processor) : Passthrough(subprocessor)
 
         terminal.println(Markdown("""
             ## Preface
-            KtSync is starting to backup your files. You chose to backup the folder ${(brightWhite)(profile.sourcePath!!)} into the folder ${(brightWhite)(profile.destinationPath!!)} using the ${(brightWhite)("Full Backup algorithm")}. If the destination already exists, it will be safely renamed, do not worry about that.
+            KtSync is starting to backup your files. You chose to backup the folder ${(brightWhite)(profile.sourcePath!!)} into the folder dropbox: ${(brightWhite)(profile.destinationPath!!)} using the ${(brightWhite)("Cumulative Backup algorithm")}. If the destination already exists, it will be safely renamed, do not worry about that.
             ## Progress
         """.trimIndent()))
 
