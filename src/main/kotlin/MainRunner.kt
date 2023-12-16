@@ -1,6 +1,7 @@
+import java.io.File
 import kotlin.system.exitProcess
 
-// This class populates a ProcessingProcess/Profile instances with details of what the operation is, creates a terminal, and catches any exceptions and turns them into 0/1 exit status.
+// This class populates a ProcessingJob/JobDescription instances with details of what the operation is, runs the job, and catches any exceptions and turns them into 0/1 exit status.
 class MainRunner (val subprocessor: Processor) {
 
     fun run () {
@@ -13,7 +14,6 @@ class MainRunner (val subprocessor: Processor) {
                 destinationPath = "temporary/destination1"
             }
         }
-
         try {
             subprocessor.backupProcess(process)
             exitProcess(0)
@@ -21,6 +21,12 @@ class MainRunner (val subprocessor: Processor) {
         catch (e: Exception) {
             exitProcess(1)
         }
+    }
+
+    fun readAtedString (text:String): String {
+        if (text.startsWith("@"))
+            return File(text.removePrefix("@")).readText(Charsets.UTF_8)
+        return text
     }
 
 }
