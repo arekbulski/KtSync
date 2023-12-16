@@ -8,10 +8,10 @@ class MainRunner (val subprocessor: Processor) {
         // TODO: This configuration needs to be read from a JSON file or from the terminal. For now the operation arguments are hardcoded into the code.
         val process = ProcessingJob().apply {
             jobDescription = JobDescription().apply {
-                operation = "backup"
-                algorithm = "full"
                 sourcePath = "temporary/source"
                 destinationPath = "temporary/destination1"
+                operation = JobOperation.Backup
+                algorithm = JobAlgorithm.Cumulative
             }
         }
         try {

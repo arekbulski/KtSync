@@ -2,8 +2,8 @@
 // This class represents a backup/restore job (just the configuration details).
 class JobDescription {
 
-    var operation: String? = null
-    var algorithm: String? = null
+    var operation: JobOperation = JobOperation.Undefined
+    var algorithm: JobAlgorithm = JobAlgorithm.Undefined
 
     var sourcePath: String? = null
     var destinationPath: String? = null
