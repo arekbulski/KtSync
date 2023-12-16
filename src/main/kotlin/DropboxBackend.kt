@@ -22,7 +22,7 @@ class DropboxBackend (subprocessor: Processor) : LocalDiskBackend(subprocessor) 
 
     override fun backupProcess(process: ProcessingJob) {
         try {
-            accessToken = process.profile!!.accessToken!!
+            accessToken = process.jobDescription!!.accessToken!!
             apiConfig = DbxRequestConfig("KtSync/WIP")
             apiClient = DbxClientV2(apiConfig, accessToken)
 

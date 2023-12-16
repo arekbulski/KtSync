@@ -5,9 +5,9 @@ open class FullBackupAlgorithm (subprocessor: Processor) : Passthrough(subproces
     // This method is called once per backup job. It, in manner of speaking, initializes it. This includes indexing the source folder.
     @ExperimentalUnsignedTypes
     override fun backupProcess(process: ProcessingJob) {
-        val profile = process.profile!!
-        val sourcePath = profile.sourcePath!!
-        val destinationPath = profile.destinationPath!!
+        val jobDescription = process.jobDescription!!
+        val sourcePath = jobDescription.sourcePath!!
+        val destinationPath = jobDescription.destinationPath!!
 
         // Allows other processors to initialize.
         subprocessor.backupProcess(process)

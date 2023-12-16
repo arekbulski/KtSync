@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 // This class represents a backup/restore job with all the configuration details, terminal and progress bar instance, statistics, time measurements, etc.
 class ProcessingJob {
 
-    var profile: Profile? = null
+    var jobDescription: JobDescription? = null
 
     var terminal: Terminal? = null
     var progressbar: ProgressAnimation? = null

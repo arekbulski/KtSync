@@ -11,7 +11,6 @@ class PrettyPrintFiles (subprocessor: Processor) : Passthrough(subprocessor) {
 
     override fun initFolderProgress(folder: ProcessingFile) {
         val process = folder.process!!
-        val profile = process.profile!!
         val terminal = process.terminal!!
 
         val relativePath = folder.relativePath!!
@@ -44,7 +43,6 @@ class PrettyPrintFiles (subprocessor: Processor) : Passthrough(subprocessor) {
 
     override fun initFileProgress(file: ProcessingFile) {
         val process = file.process!!
-        val profile = process.profile!!
         val terminal = process.terminal!!
 
         val relativePath = file.relativePath!!
@@ -101,7 +99,6 @@ class PrettyPrintFiles (subprocessor: Processor) : Passthrough(subprocessor) {
 
     override fun initSymbolicLinkProgress(symlink: ProcessingFile) {
         val process = symlink.process!!
-        val profile = process.profile!!
         val terminal = process.terminal!!
 
         val relativePath = symlink.relativePath!!

@@ -11,14 +11,14 @@ import java.time.LocalDateTime
 class PrettyPrintAlgorithm (subprocessor: Processor) : Passthrough(subprocessor) {
 
     override fun backupProcess(process: ProcessingJob) {
-        val profile = process.profile!!
+        val jobDescription = process.jobDescription!!
 
         process.terminal = Terminal()
         val terminal = process.terminal!!
 
         terminal.println(Markdown("""
             ## Preface
-            KtSync is starting to backup your files. You chose to backup the folder ${(brightWhite)(profile.sourcePath!!)} into the folder dropbox: ${(brightWhite)(profile.destinationPath!!)} using the ${(brightWhite)("Cumulative Backup algorithm")}. If the destination already exists, it will be safely renamed, do not worry about that.
+            KtSync is starting to backup your files. You chose to backup the folder ${(brightWhite)(jobDescription.sourcePath!!)} into the folder dropbox: ${(brightWhite)(jobDescription.destinationPath!!)} using the ${(brightWhite)("Cumulative Backup algorithm")}. If the destination already exists, it will be safely renamed, do not worry about that.
             ## Progress
         """.trimIndent()))
 

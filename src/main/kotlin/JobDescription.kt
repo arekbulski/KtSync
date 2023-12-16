@@ -1,6 +1,6 @@
 
 // This class represents a backup/restore job (just the configuration details).
-class Profile {
+class JobDescription {
 
     var operation: String? = null
     var algorithm: String? = null
