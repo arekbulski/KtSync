@@ -22,4 +22,6 @@ class ProcessingJob {
     var processingBegun: LocalDateTime? = null
     var processingEnded: LocalDateTime? = null
 
+    // TODO: Add toString implementation.
+
 }
